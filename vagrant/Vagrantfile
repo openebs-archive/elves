@@ -11,8 +11,9 @@ GO_VERSION="1.7.1"
 # Install Prereq Packages
 sudo apt-get update
 sudo apt-get install -y
+sudo apt-get install -y curl
 
-# Setup go, for development of Maya
+# Setup go
 SRCROOT="/opt/go"
 SRCPATH="/opt/gopath"
 
@@ -59,6 +60,10 @@ sudo usermod -aG docker vagrant
 # Create base folder for OpenEBS Dev Environment
 sudo mkdir -p $SRCPATH/src/github.com/openebs
 cd $SRCPATH/src/github.com/openebs
+sudo git clone https://github.com/openebs/maya.git
+sudo git clone https://github.com/openebs/openebs.git
+sudo git clone https://github.com/openebs/longhorn.git
+
 
 SCRIPT
 
@@ -83,7 +88,7 @@ end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   1.upto(1) do |n|
-    vmName = "maya-%02d" % [n]
+    vmName = "openebs-dev-%02d" % [n]
     isFirstBox = (n == 1)
 
     numCPUs = DEFAULT_CPU_COUNT
