@@ -56,13 +56,10 @@ sudo service docker restart
 # Make sure we can actually use docker as the vagrant user
 sudo usermod -aG docker vagrant
 
-# Setup Maya for development
-cd /opt/gopath/src/github.com/amitkumardas/maya && make bootstrap
+# Create base folder for OpenEBS Dev Environement
+sudo mkdir -p $SRCPATH/src/github.com/openebs
+cd $SRCPATH/src/github.com/openebs
 
-# CD into the Maya working directory when we login to the VM
-grep "cd /opt/gopath/src/github.com/amitkumardas/maya" ~/.profile \
-  || echo "cd /opt/gopath/src/github.com/amitkumardas/maya" \
-  >> ~/.profile
 SCRIPT
 
 def configureVM(vmCfg, vmParams={
@@ -72,7 +69,6 @@ def configureVM(vmCfg, vmParams={
   vmCfg.vm.box = "cbednarski/ubuntu-1404"
 
   vmCfg.vm.provision "shell", inline: $script, privileged: false
-  vmCfg.vm.synced_folder '.', '/opt/gopath/src/github.com/amitkumardas/maya'
 
   cpus = vmParams.fetch(:numCPUs, DEFAULT_CPU_COUNT)
   memory = 2048
