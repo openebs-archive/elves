@@ -56,7 +56,7 @@ sudo service docker restart
 # Make sure we can actually use docker as the vagrant user
 sudo usermod -aG docker vagrant
 
-# Create base folder for OpenEBS Dev Environement
+# Create base folder for OpenEBS Dev Environment
 sudo mkdir -p $SRCPATH/src/github.com/openebs
 cd $SRCPATH/src/github.com/openebs
 
