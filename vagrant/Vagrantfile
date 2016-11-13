@@ -58,11 +58,11 @@ sudo service docker restart
 sudo usermod -aG docker vagrant
 
 # Create base folder for OpenEBS Dev Environment
-sudo mkdir -p $SRCPATH/src/github.com/openebs
+mkdir -p $SRCPATH/src/github.com/openebs
 cd $SRCPATH/src/github.com/openebs
-sudo git clone https://github.com/openebs/maya.git
-sudo git clone https://github.com/openebs/openebs.git
-sudo git clone https://github.com/openebs/longhorn.git
+git clone https://github.com/openebs/maya.git
+git clone https://github.com/openebs/openebs.git
+git clone https://github.com/openebs/longhorn.git
 
 
 SCRIPT
