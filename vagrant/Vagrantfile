@@ -64,6 +64,9 @@ git clone https://github.com/openebs/maya.git
 git clone https://github.com/openebs/openebs.git
 git clone https://github.com/openebs/longhorn.git
 
+#setup openebs install path
+sudo mkdir -p /etc/openebs
+sudo chown -R vagrant:vagrant /etc/openebs 2>/dev/null || true
 
 SCRIPT
 
