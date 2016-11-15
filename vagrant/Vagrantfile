@@ -32,6 +32,7 @@ sudo chown vagrant:vagrant $SRCROOT
 # directory the right user/group, we need to set it properly on the
 # parent path to allow subsequent "go get" commands to work.
 sudo mkdir -p $SRCPATH
+sudo mkdir -p $SRCPATH/bin
 sudo chown -R vagrant:vagrant $SRCPATH 2>/dev/null || true
 # ^^ silencing errors here because we expect this to fail for the shared folder
 
@@ -43,6 +44,7 @@ EOF
 sudo mv /tmp/gopath.sh /etc/profile.d/gopath.sh
 sudo chmod 0755 /etc/profile.d/gopath.sh
 source /etc/profile.d/gopath.sh
+
 
 # Install Docker
 echo deb https://apt.dockerproject.org/repo ubuntu-`lsb_release -c \
@@ -56,6 +58,12 @@ sudo service docker restart
 
 # Make sure we can actually use docker as the vagrant user
 sudo usermod -aG docker vagrant
+
+#Install Glide to manage the vendor package dependencies
+curl https://glide.sh/get | sh
+
+#Some of the dependent projects use trash for package management
+go get -u github.com/rancher/trash
 
 # Create base folder for OpenEBS Dev Environment
 mkdir -p $SRCPATH/src/github.com/openebs
