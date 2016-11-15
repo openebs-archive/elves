@@ -20,7 +20,7 @@ cd elves/vagrant
 sudo vagrant up
 sudo vagrant ssh
 ```
-Once you are in the development VM, you can go to the requirement project and issue 'make'
+Once you are in the development VM, you can go to the required project and issue 'make'
 
 ```
 vagrant@openebs-dev-01:~$ cd /opt/gopath/src/github.com/openebs/openebs/
