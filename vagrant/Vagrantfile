@@ -76,7 +76,7 @@ git clone https://github.com/openebs/longhorn.git
 sudo mkdir -p /etc/openebs
 sudo chown -R vagrant:vagrant /etc/openebs 2>/dev/null || true
 # update the dependencies for the longhorn project (run trash)
-cd $SRCPATH/src/github.com/openebs/lonhorn
+cd $SRCPATH/src/github.com/openebs/longhorn
 trash .
 SCRIPT
 
