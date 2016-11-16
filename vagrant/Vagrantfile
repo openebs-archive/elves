@@ -75,7 +75,9 @@ git clone https://github.com/openebs/longhorn.git
 #setup openebs install path
 sudo mkdir -p /etc/openebs
 sudo chown -R vagrant:vagrant /etc/openebs 2>/dev/null || true
-
+# update the dependencies for the longhorn project (run trash)
+cd $SRCPATH/src/github.com/openebs/lonhorn
+trash .
 SCRIPT
 
 def configureVM(vmCfg, vmParams={
