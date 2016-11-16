@@ -24,5 +24,5 @@ Once you are in the development VM, you can go to the required project and issue
 
 ```
 vagrant@openebs-dev-01:~$ cd /opt/gopath/src/github.com/openebs/openebs/
-vagrant@openebs-dev-01:/opt/gopath/src/github.com/openebs/openebs$ make
+vagrant@openebs-dev-01:/opt/gopath/src/github.com/openebs/openebs$ sudo make
 ```
