@@ -1,9 +1,13 @@
-# elves
-Helpers for setting up the development and demo environements
+# Elves
+
+Helpers for setting up the development and demo environements.
+
+This is our `programmable infrastructure` repository.
 
 ## Setting up build environement
 
 ### Pre-requisites
+
 - Linux Host ( say Ubuntu )
 - Virtual Box 
 - Vagrant
@@ -11,6 +15,7 @@ Helpers for setting up the development and demo environements
 - Create a developement folder ( say /opt/dev )
 
 ### Steps
+
 In your linux host
 
 ```
@@ -20,6 +25,7 @@ cd elves/vagrant
 sudo vagrant up
 sudo vagrant ssh
 ```
+
 Once you are in the development VM, you can go to the required project and issue 'make'
 
 ```
