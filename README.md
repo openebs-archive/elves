@@ -2,7 +2,7 @@
 
 Helpers for setting up the development and demo environements.
 
-This is our `programmable infrastructure` repository.
+This is our `programmable infrastructures` repository.
 
 ## Setting up build environement
 
