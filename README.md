@@ -29,6 +29,6 @@ sudo vagrant ssh
 Once you are in the development VM, you can go to the required project and issue 'make'
 
 ```
-vagrant@openebs-dev-01:~$ cd /opt/gopath/src/github.com/openebs/openebs/
-vagrant@openebs-dev-01:/opt/gopath/src/github.com/openebs/openebs$ sudo make
+vagrant@openebs-dev-01:~$ cd /opt/gopath/src/github.com/openebs/longhorn/
+vagrant@openebs-dev-01:/opt/gopath/src/github.com/openebs/longhorn$ sudo make
 ```
