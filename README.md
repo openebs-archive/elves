@@ -4,7 +4,7 @@ Helpers for setting up the development and demo environements.
 
 This is our `programmable infrastructures` repository.
 
-## Setting up build environement
+## Setting up build/development environement
 
 ### Pre-requisites
 
@@ -21,7 +21,7 @@ In your linux host
 ```
 cd <dev-folder>
 sudo git clone https://github.com/openebs/elves.git
-cd elves/vagrant
+cd elves/dev
 sudo vagrant up
 sudo vagrant ssh
 ```
