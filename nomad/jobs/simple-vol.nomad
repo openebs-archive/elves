@@ -63,9 +63,7 @@ job "simple-vol" {
 			# Configure Docker driver with the image
 			config {
 				image = "openebs/jiva"
-				port_map {
-					iscsi = 3260
-				}
+				privileged = true
 			}
 
 			service {
@@ -87,7 +85,7 @@ job "simple-vol" {
 				cpu = 500 # 500 MHz
 				memory = 256 # 256MB
 				network {
-					mbits = 200
+					mbits = 20
 					port "iscsi" {}
 				}
 			}
