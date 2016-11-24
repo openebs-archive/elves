@@ -64,6 +64,8 @@ job "simple-vol" {
 			config {
 				image = "openebs/jiva"
 				privileged = true
+				command = "launch-simple-jiva"
+				args = [ "simple-vol", "1g", "gotgt" ]
 			}
 
 			service {
@@ -86,7 +88,9 @@ job "simple-vol" {
 				memory = 256 # 256MB
 				network {
 					mbits = 20
-					port "iscsi" {}
+					port "iscsi" {
+						static = "3260"
+					}
 				}
 			}
 
