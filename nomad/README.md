@@ -14,18 +14,42 @@ Playground for defining and testing nomad jiva job specs.
 
 ### Steps
 
-In your linux host
+## Initial Setup
 
+In your linux host
 ```
 cd <dev-folder>
 sudo git clone https://github.com/openebs/elves.git
 cd elves/nomad
-sudo vagrant up
-sudo vagrant ssh
+vagrant up
+vagrant ssh
 ```
 
-Once you are in the development VM, you can run your nomad as follows:
+## Running nomad
+```
+cd <dev-folder>/elves/nomad
+vagrant up
+vagrant ssh
+vagrant@nomad-dev:~$ nomad agent -dev -config /vagrant/config
+```
 
+## Running jiva 
 ```
-sudo nomad agent -dev -config /vagrant/config
+vagrant@nomad-dev:~$ nomad status
+vagrant@nomad-dev:~$ nomad run /vagrant/jobs/simple-jiva-vol.nomad 
+vagrant@nomad-dev:~$ docker images
 ```
+
+## Checking status of trouble shooting
+```
+vagrant@nomad-dev:~$ nomad status
+vagrant@nomad-dev:~$ docker images
+vagrant@nomad-dev:~$ docker ps -a
+```
+
+Check docker logs
+```
+sudo journalctl -fu docker.service
+```
+
+
