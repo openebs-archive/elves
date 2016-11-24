@@ -4,7 +4,7 @@
 $script = <<SCRIPT
 # Update apt and get dependencies
 sudo apt-get update
-sudo apt-get install -y unzip curl wget vim
+sudo apt-get install -y unzip curl wget vim open-iscsi
 
 # Download Nomad
 echo Fetching Nomad...
@@ -20,17 +20,32 @@ sudo mv nomad /usr/bin/nomad
 sudo mkdir -p /etc/nomad.d
 sudo chmod a+w /etc/nomad.d
 
+# Install Docker
+echo Installing Docker
+echo deb https://apt.dockerproject.org/repo ubuntu-`lsb_release -c \
+  | awk '{print $2}'` main | sudo tee /etc/apt/sources.list.d/docker.list
+
+sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+sudo apt-get update
+sudo apt-get install -y docker-engine
+
+# Restart docker to make sure we get the latest version of the daemon if there is an upgrade
+sudo service docker restart
+
+# Make sure we can actually use docker as the vagrant user
+sudo usermod -aG docker vagrant
+
 SCRIPT
 
 Vagrant.configure(2) do |config|
   vmName = "nomad-dev"
-  config.vm.box = "puphpet/ubuntu1404-x64"
+  config.vm.box = "bento/ubuntu-16.04"
 
   config.vm.define vmName do |vmCfg|
       vmCfg.vm.hostname = vmName
   end
   config.vm.provision "shell", inline: $script, privileged: false
-  config.vm.provision "docker" # Just install it
+  #config.vm.provision "docker" # Just install it
 
   # Increase memory for Parallels Desktop
   config.vm.provider "parallels" do |p, o|
@@ -40,6 +55,7 @@ Vagrant.configure(2) do |config|
   # Increase memory for Virtualbox
   config.vm.provider "virtualbox" do |vb|
         vb.memory = "1024"
+	vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
   end
 
   # Increase memory for VMware
