@@ -23,8 +23,12 @@ sudo chmod a+w /etc/nomad.d
 SCRIPT
 
 Vagrant.configure(2) do |config|
+  vmName = "nomad-dev"
   config.vm.box = "puphpet/ubuntu1404-x64"
-  config.vm.hostname = "nomad"
+
+  config.vm.define vmName do |vmCfg|
+      vmCfg.vm.hostname = vmName
+  end
   config.vm.provision "shell", inline: $script, privileged: false
   config.vm.provision "docker" # Just install it
 
