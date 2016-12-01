@@ -99,12 +99,36 @@ def configureVM(vmCfg, vmParams={
   return vmCfg
 end
 
+#install required plugins if necessary
+if ARGV[0] == 'up'
+   # add required plugins here
+   required_plugins = %w( vagrant-cachier )
+   missing_plugins = []
+   required_plugins.each do |plugin|
+   missing_plugins.push(plugin) unless Vagrant.has_plugin? plugin
+       end
+
+   if ! missing_plugins.empty?
+   install_these = missing_plugins.join(' ')
+   puts "Found missing plugins: #{install_these}.  Installing using sudo..."
+   exec "sudo vagrant plugin install #{install_these}; vagrant up"
+   end
+end
+
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   1.upto(1) do |n|
     vmName = "openebs-dev-%02d" % [n]
     isFirstBox = (n == 1)
 
     numCPUs = DEFAULT_CPU_COUNT
+
+#Adding Vagrant-cachier
+if Vagrant.has_plugin?("vagrant-cachier")
+   config.cache.scope = :machine
+   config.cache.enable :apt
+   config.cache.enable :gem
+end
+
     if isFirstBox and Object::RUBY_PLATFORM =~ /darwin/i
       # Override the max CPUs for the first VM
       numCPUs = [numCPUs, (`/usr/sbin/sysctl -n hw.ncpu`.to_i - 1)].max
