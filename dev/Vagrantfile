@@ -71,6 +71,7 @@ cd $SRCPATH/src/github.com/openebs
 git clone https://github.com/openebs/maya.git
 git clone https://github.com/openebs/openebs.git
 git clone https://github.com/openebs/longhorn.git
+git clone https://github.com/openebs/jiva.git
 
 #setup openebs install path
 sudo mkdir -p /etc/openebs
@@ -84,7 +85,7 @@ def configureVM(vmCfg, vmParams={
                   numCPUs: DEFAULT_CPU_COUNT,
                 }
                )
-  vmCfg.vm.box = "cbednarski/ubuntu-1404"
+  vmCfg.vm.box = "bento/ubuntu-16.04"
 
   vmCfg.vm.provision "shell", inline: $script, privileged: false
 
@@ -94,6 +95,8 @@ def configureVM(vmCfg, vmParams={
   vmCfg.vm.provider "virtualbox" do |v|
     v.memory = memory
     v.cpus = cpus
+    #This is a work-around for VirtualBox / Ubuntu16
+    v.customize ["modifyvm", :id, "--cableconnected1", "on"]
   end
 
   return vmCfg
@@ -122,12 +125,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     numCPUs = DEFAULT_CPU_COUNT
 
-#Adding Vagrant-cachier
-if Vagrant.has_plugin?("vagrant-cachier")
-   config.cache.scope = :machine
-   config.cache.enable :apt
-   config.cache.enable :gem
-end
+    #Adding Vagrant-cachier
+    if Vagrant.has_plugin?("vagrant-cachier")
+      config.cache.scope = :machine
+      config.cache.enable :apt
+      config.cache.enable :gem
+    end
 
     if isFirstBox and Object::RUBY_PLATFORM =~ /darwin/i
       # Override the max CPUs for the first VM
