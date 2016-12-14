@@ -12,25 +12,26 @@ This is our `programmable infrastructures` repository.
 - Virtual Box 
 - Vagrant
 - Git
-- Create a developement folder ( say /opt/dev )
+- Create a developement folder ( say ~/github/openebs )
 
 ### Steps
 
 In your linux host
 
 ```
-cd <dev-folder>
-sudo git clone https://github.com/openebs/elves.git
+mkdir -p ~/github/openebs
+cd ~/github/openebs
+git clone https://github.com/openebs/elves.git
 cd elves/dev
-sudo vagrant up
-sudo vagrant ssh
+vagrant up
+vagrant ssh
 ```
 
 Once you are in the development VM, you can go to the required project and issue 'make'
 
 ```
-vagrant@openebs-dev-01:~$ cd /opt/gopath/src/github.com/openebs/longhorn/
-vagrant@openebs-dev-01:/opt/gopath/src/github.com/openebs/longhorn$ sudo make
+vagrant@openebs-dev-01:~$ cd gopath/src/github.com/openebs/longhorn/
+vagrant@openebs-dev-01:~/gopath/src/github.com/openebs/longhorn$ make
 ```
 
 ## FAQ
