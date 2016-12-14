@@ -15,7 +15,7 @@ sudo apt-get install -y curl zip unzip
 
 # Setup go
 SRCROOT="/opt/go"
-SRCPATH="/opt/gopath"
+SRCPATH="/home/vagrant/gopath"
 
 # Get the ARCH
 ARCH=`uname -m | sed 's|i686|386|' | sed 's|x86_64|amd64|'`
@@ -67,18 +67,17 @@ go get -u github.com/rancher/trash
 
 # Create base folder for OpenEBS Dev Environment
 mkdir -p $SRCPATH/src/github.com/openebs
+
+# Fetch the openebs code
 cd $SRCPATH/src/github.com/openebs
 git clone https://github.com/openebs/maya.git
 git clone https://github.com/openebs/openebs.git
 git clone https://github.com/openebs/longhorn.git
 git clone https://github.com/openebs/jiva.git
 
-#setup openebs install path
-sudo mkdir -p /etc/openebs
-sudo chown -R vagrant:vagrant /etc/openebs 2>/dev/null || true
 # update the dependencies for the longhorn project (run trash)
-cd $SRCPATH/src/github.com/openebs/longhorn
-trash .
+cd $SRCPATH/src/github.com/openebs/longhorn && trash .
+
 SCRIPT
 
 def configureVM(vmCfg, vmParams={
