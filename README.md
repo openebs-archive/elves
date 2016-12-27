@@ -1,10 +1,10 @@
 # Elves
 
-Helpers for setting up the development and demo environements.
+Helpers for setting up the development and demo environments.
 
 This is our `programmable infrastructures` repository.
 
-## Setting up build/development environement
+## Setting up build/development environment
 
 ### Pre-requisites
 
@@ -12,7 +12,7 @@ This is our `programmable infrastructures` repository.
 - Virtual Box 
 - Vagrant
 - Git
-- Create a developement folder ( say ~/github/openebs )
+- Create a development folder ( say ~/github/openebs )
 
 ### Steps
 
