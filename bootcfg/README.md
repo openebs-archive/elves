@@ -1,4 +1,4 @@
-### BootCfg Elf
+### BootCfg Elf (*Future*)
 
 Playground for defining & testing the install/deployment related features 
 of openebs maya master (`omm`) & openebs storage host (`osh`). This will make 
