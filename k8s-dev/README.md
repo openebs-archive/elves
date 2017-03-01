@@ -1,0 +1,1 @@
+This project aim's at automating the steps for installing K8s descibed in the following document - [Kubernetes Setup for OpenEBS Demo](https://docs.google.com/document/d/1Ige6SwecYLglxmRT4NDmDr1gYDkoWR_pRF4wiWNA_E8)
