@@ -1,0 +1,14 @@
+[Unit]
+Description=Flannel SDN
+Documentation=https://github.com/coreos/flannel
+
+[Service]
+ExecStart=/usr/local/bin/flanneld \
+  --iface=enp0s8 \
+  --etcd-cafile=/var/lib/kubernetes/ca.crt \
+  --etcd-endpoints=https://k8s-master-1:2379
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
