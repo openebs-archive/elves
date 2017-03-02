@@ -23,6 +23,7 @@ sudo mv flanneld-amd64 /usr/local/bin/flanneld
 etcdctl --ca-file=/var/lib/kubernetes/ca.crt set /coreos.com/network/config '{"Network": "10.200.0.0/16", "SubnetLen":24, "Backend": {"Type": "vxlan"}}'
 Add the k8s-master-1 IP address in the /etc/hosts of the minion
 
+Update the interface (iface) parameter for the flannel.service
 
 sudo cp flannel.service /etc/systemd/system/flannel.service
 sudo systemctl daemon-reload
@@ -54,7 +55,7 @@ sudo systemctl daemon-reload
 sudo systemctl start kubelet
 sudo systemctl status kubelet
 
-sudo cp kubelet.service /etc/systemd/system/kube-proxy.service
+sudo cp kube-proxy.service /etc/systemd/system/kube-proxy.service
 sudo systemctl daemon-reload
 sudo systemctl start kube-proxy
 sudo systemctl status kube-proxy
