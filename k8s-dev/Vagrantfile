@@ -12,19 +12,16 @@ Vagrant.require_version ">= 1.9.1"
 boxes = [
     {
         :name => "k8s-master-1",
-        :eth1 => "10.240.0.1",
         :mem => "1024",
         :cpu => "1"
     },
     {
         :name => "k8s-node-1",
-        :eth1 => "10.240.0.4",
         :mem => "1024",
         :cpu => "1"
     },
     {
         :name => "k8s-node-2",
-        :eth1 => "10.240.0.5",
         :mem => "1024",
         :cpu => "1"
     }
@@ -37,19 +34,18 @@ Vagrant.configure(2) do |config|
       config.vm.define opts[:name] do |config|
         config.vm.hostname = opts[:name]
 
-        config.vm.provider "vmware_fusion" do |v|
-          v.vmx["memsize"] = opts[:mem]
-          v.vmx["numvcpus"] = opts[:cpu]
-        end
-
         config.vm.provider "virtualbox" do |v|
           v.customize ["modifyvm", :id, "--memory", opts[:mem]]
           v.customize ["modifyvm", :id, "--cpus", opts[:cpu]]
+          v.customize ["modifyvm", :id, "--cableconnected1", "on"]
         end
 
-        config.vm.network :private_network, ip: opts[:eth1]
+        config.vm.network :private_network, type: "dhcp"
       end
   end
+
+  config.vm.provision "shell", path: "./gen-tools/install_tools.sh"
+
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
   # `vagrant box outdated`. This is not recommended.
@@ -109,4 +105,6 @@ Vagrant.configure(2) do |config|
  #   sudo apt-get install -y docker.io
  #   apt-get install -y kubelet kubeadm kubectl kubernetes-cni
  # SHELL
+
+
 end
