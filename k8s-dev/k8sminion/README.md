@@ -36,8 +36,7 @@ ip addr show
 
 wget https://get.docker.com/builds/Linux/x86_64/docker-latest.tgz
 sudo tar -xvf docker-latest.tgz
-sudo cp docker/docker* /usr/bin/
-rm -rf docker*
+sudo mv docker/docker* /usr/bin/
 
 
 sudo cp docker.service /etc/systemd/system/docker.service
