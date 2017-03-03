@@ -8,6 +8,8 @@ sudo cp ../certs/client.key /var/lib/kubernetes
 sudo mkdir /opt/cni
 wget https://storage.googleapis.com/kubernetes-release/network-plugins/cni-07a8a28637e97b22eb8dfe710eeae1344f69d16e.tar.gz
 sudo tar -xvf cni-07a8a28637e97b22eb8dfe710eeae1344f69d16e.tar.gz -C /opt/cni
+rm -rf cni-07a8a28637e97b22eb8dfe710eeae1344f69d16e.tar.gz
+
 
 sudo mkdir -p /var/lib/kubernetes/cni/net.d/
 sudo cp 10-flannel.conf /var/lib/kubernetes/cni/net.d/
@@ -32,9 +34,11 @@ sudo systemctl status flannel
 ip addr show
 
 
-sudo wget https://get.docker.com/builds/Linux/x86_64/docker-latest.tgz
+wget https://get.docker.com/builds/Linux/x86_64/docker-latest.tgz
 sudo tar -xvf docker-latest.tgz
 sudo cp docker/docker* /usr/bin/
+rm -rf docker*
+
 
 sudo cp docker.service /etc/systemd/system/docker.service
 sudo systemctl daemon-reload
@@ -59,3 +63,10 @@ sudo cp kube-proxy.service /etc/systemd/system/kube-proxy.service
 sudo systemctl daemon-reload
 sudo systemctl start kube-proxy
 sudo systemctl status kube-proxy
+
+
+
+sudo systemctl enable flannel
+sudo systemctl enable kubelet
+sudo systemctl enable kube-proxy
+

@@ -31,5 +31,8 @@ tail -f /var/log/syslog
 kubectl get componentstatus
 kubectl get componentstatuses
 
+sudo systemctl enable kube-apiserver
+sudo systemctl enable kube-controller-manager
+sudo systemctl enable kube-scheduler
 
 
