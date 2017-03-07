@@ -1,3 +1,4 @@
+```
 sudo mkdir /etc/etcd
 sudo cp ../certs/ca.crt /etc/etcd/
 sudo cp ../certs/client.crt /etc/etcd/
@@ -5,7 +6,7 @@ sudo cp ../certs/client.key /etc/etcd/
 
 sudo chown -R etcd /etc/etcd/
 sudo chgrp -R etcd /etc/etcd/
-
+```
 
 Set etcd configuration (/etc/default/etcd) and change the gray values appropriately:
 
@@ -29,7 +30,8 @@ ETCD_PEER_TRUSTED_CA_FILE="/etc/etcd/ca.crt"
 
 
 Restart and verify etcd
+```
 $ systemctl restart etcd
 $ systemctl status etcd
 $ etcdctl --ca-file=/etc/etcd/ca.crt cluster-health
-
+```
