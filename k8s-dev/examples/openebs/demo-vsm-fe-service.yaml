@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-vsm-fe-service
+  labels:
+    app: demo-vsm-fe-service
+spec:
+  ports:
+    # the port that this service should serve on
+  - port: 3260
+    name: "iscsi"
+  - port: 9501
+    name: "api"
+  selector:
+    app: demo-vsm-fe

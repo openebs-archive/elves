@@ -1,0 +1,19 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: demo-vsm-fe
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: demo-vsm-fe
+    spec:
+      containers:
+      - name: demo-vsm-fe
+        image: openebs/jiva:latest
+        ports:
+        - containerPort: 3260
+        - containerPort: 9501
+        command: ["launch"]
+        args: ["controller", "--frontend", "gotgt", "demo-vol1"]
