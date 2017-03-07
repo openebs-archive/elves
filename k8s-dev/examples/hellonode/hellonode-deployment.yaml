@@ -1,0 +1,16 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: hello-node-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: hello-node
+    spec:
+      containers:
+      - name: hello-node
+        image: kiranmova/hellonode:v1
+        ports:
+        - containerPort: 8080
