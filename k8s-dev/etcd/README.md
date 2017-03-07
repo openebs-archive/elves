@@ -3,7 +3,15 @@ sudo mkdir /etc/etcd
 sudo cp ../certs/ca.crt /etc/etcd/
 sudo cp ../certs/client.crt /etc/etcd/
 sudo cp ../certs/client.key /etc/etcd/
+```
 
+Intall the etcd using 
+```
+sudo apt-get install etcd
+```
+The above should have created the user etcd
+
+```
 sudo chown -R etcd /etc/etcd/
 sudo chgrp -R etcd /etc/etcd/
 ```
