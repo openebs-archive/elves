@@ -1,4 +1,5 @@
 
+```
 sudo mkdir -p /var/lib/kubernetes
 sudo cp ../certs/ca.crt /var/lib/kubernetes
 sudo cp ../certs/client.crt /var/lib/kubernetes
@@ -34,5 +35,5 @@ kubectl get componentstatuses
 sudo systemctl enable kube-apiserver
 sudo systemctl enable kube-controller-manager
 sudo systemctl enable kube-scheduler
-
+```
 
