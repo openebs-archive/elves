@@ -1,4 +1,4 @@
-
+```
 sudo mkdir -p /var/lib/kubernetes
 sudo cp ../certs/ca.crt /var/lib/kubernetes
 sudo cp ../certs/client.crt /var/lib/kubernetes
@@ -69,3 +69,4 @@ sudo systemctl enable flannel
 sudo systemctl enable kubelet
 sudo systemctl enable kube-proxy
 
+```
