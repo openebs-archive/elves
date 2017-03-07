@@ -9,6 +9,9 @@ sudo cp ../certs/client.key /var/lib/kubernetes
 sudo cp authorization-policy.jsonl /var/lib/kubernetes/
 sudo cp token.csv /var/lib/kubernetes/
 
+#Install the k8s-master libraries
+sh install_k8smaster.sh
+
 Update the IP address of the etcd service in the kube-apiserver.service. 
 
 sudo cp kube-apiserver.service /etc/systemd/system/
