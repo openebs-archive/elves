@@ -1,4 +1,8 @@
 
+Install cfssl 
+```
+sh install_cfssl.sh
+```
 
 Use the default ca-csr.json provided in the ./certs/ca-csr.json 
 
