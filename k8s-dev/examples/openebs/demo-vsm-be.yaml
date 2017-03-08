@@ -1,0 +1,28 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: demo-vsm-be
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: demo-vsm-be
+    spec:
+      containers:
+      - name: demo-vsm-be
+        image: openebs/jiva:latest
+        ports:
+        - containerPort: 9502
+        - containerPort: 9503
+        - containerPort: 9504
+        command: ["launch"]
+        args: ["replica", "--frontendIP", "10.32.0.191", "--size", "1G", "/store"]
+        volumeMounts:
+        - mountPath: /store
+          name: be-store
+      volumes:
+      - name: be-store
+        hostPath:
+          path: /tmp/vsm/store1
+
