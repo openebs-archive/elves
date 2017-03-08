@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    command: ["/bin/ls", "-lah", "/mnt"]
+    volumeMounts:
+    - name: temp
+      mountPath: /mnt/temp
+    ports:
+    - containerPort: 80
+  volumes:
+  - name: temp
+    flexVolume:
+      driver: "cb/temp"
+      options:
+        source: "/tmp/temp"
+        mountOptions: "dir_mode=0755,file_mode=0644,rw"
