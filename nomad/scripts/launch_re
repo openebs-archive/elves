@@ -1,0 +1,24 @@
+#!/bin/bash
+
+waitforever() {
+    while true; 
+    do
+      sleep 10
+      echo "Still alive"
+    done
+}
+
+_stop() {
+  echo "Stopping RAW_EXEC_PROCESS"
+  echo "finished"
+  exit
+}
+
+echo "Trapping SIGINT, SIGTERM and SIGKILL"
+trap _stop SIGINT
+trap _stop SIGTERM
+
+echo "I do nothing, but wait.."
+waitforever
+
+
