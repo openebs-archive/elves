@@ -1,7 +1,8 @@
-#!/bin/bash
+#!/bin/bash -x
 
+KEEP_ALIVE=false
 waitforever() {
-    while true; 
+    while ${KEEP_ALIVE}; 
     do
       sleep 10
       echo "Still alive"
@@ -11,6 +12,7 @@ waitforever() {
 _stop() {
   echo "Stopping RAW_EXEC_PROCESS"
   echo "finished"
+  KEEP_ALIVE=false
   exit
 }
 
@@ -19,6 +21,7 @@ trap _stop SIGINT
 trap _stop SIGTERM
 
 echo "I do nothing, but wait.."
+KEEP_ALIVE=true
 waitforever
 
 
