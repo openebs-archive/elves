@@ -11,7 +11,7 @@ job "demo-vsm" {
 	#Declare the IP parameters generic to all controllers and replicas
 	meta {
 		JIVA_VOLNAME = "demo-vol1"
-		JIVA_VOLSIZE = "10g"
+		JIVA_VOLSIZE = "5g"
 		JIVA_FRONTENDIP = "172.28.128.101"
 	}
 
@@ -21,11 +21,8 @@ job "demo-vsm" {
 		# Configure the restart policy for the task group. If not provided, a
 		# default is used based on the job type.
 		restart {
-			# The number of attempts to run the job within the specified interval.
-			attempts = 3
-			interval = "5m"
-			delay = "25s"
-			mode = "delay"
+			mode = "fail"
+			attempts = 1
 		}
 
 		# Define the controller task to run
@@ -70,11 +67,8 @@ job "demo-vsm" {
 		# Configure the restart policy for the task group. If not provided, a
 		# default is used based on the job type.
 		restart {
-			# The number of attempts to run the job within the specified interval.
-			attempts = 3
-			interval = "5m"
-			delay = "25s"
-			mode = "delay"
+			mode = "fail"
+			attempts = 1
 		}
 
 		# Define the controller task to run
