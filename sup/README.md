@@ -100,7 +100,8 @@ commands:
     run: echo $SUP_NETWORK $SUP_HOST $SUP_ENV
 ```
 
-### Structuring projects with sup
+
+## Structuring projects with sup
 
 - Query: Can we import external sup file(s) ?
   - Answer: This is not possible

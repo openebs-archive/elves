@@ -11,7 +11,7 @@ In future, we might put `mtool` concepts in `openebs` repository. The trials of
 
 ### Intent
 
-Express the [intent](intent.md) of the test case in a yaml file.
+Express the [intent](intent.md) of your requirement in a yaml file.
 
 ### CLI
 
