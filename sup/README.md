@@ -2,8 +2,8 @@
 
 [Sup](https://github.com/pressly/sup) is a tool similar in spirit to Ansible. 
 We shall conduct various experiments with `sup`. If these experiments are
-satisfactory to the needs of `mtool` concept, we shall implement `mtest` using
-`sup`.
+satisfactory to the needs of [mtool](../mtool/README.md) concept, we shall 
+implement `mtest` using `sup`.
 
 ### Hands on with sup
 
