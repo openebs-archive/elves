@@ -1,26 +1,28 @@
 ## mtool
 
-`mtool` strives for declarative programming to implement a workflow. It 
-will not be another DSL library or toolkit. However, it will mention the good 
-practices to implement this declarative mode of programming.
+`mtool` believes in taskrunners that can be declarative . It will not be another 
+DSL library or toolkit to achive its beliefs. It will a best practices guideline
+to choose one such declarative tool. It will also discuss ways to extend this
+declarative taskrunner to satisfy various `devops` thought processes.
 
 The trials of `mtool` concepts will be done in specific folders within `elves` 
 repository.
 
-### Expressing intent of the workflow is mtool's key focus
+### Expressing intent of the taskrunner is mtool's key focus
 
-Express the [intent](intent.md) of your workflow in a yaml file.
+Express the [intent](intent.md) of your taskflow in a yaml file.
 
-### Tools to express intent 
+### Tools to express intent
 
 - Ansible
 - [Sup](../sup/README.md)
+- [Alfred](https://github.com/kcmerrill/alfred/)
 
-## How can one use mtool ?
+## Extending the reach of this declarative taskrunner ?
 
 ### As a CLI
 
-- Use a tool that can compose these test cases & expose them as a CLI
+- Use a tool that can compose these tasks & expose them as a CLI
   - This CLI can be packaged & released
   - e.g. `mtest` can be a packaged distribution which derives all its design principles from `mtool`.
 
