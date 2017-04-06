@@ -1,0 +1,40 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Specify the version of Sup
+SUP_VER = ENV['SUP_VER'] || "v0.5"
+
+$script = <<SCRIPT
+
+sudo apt-get install -y curl
+
+echo Fetching Sup $1 ...
+cd /tmp/
+curl -sSL https://github.com/pressly/sup/releases/download/$1/sup-linux64 -o sup
+
+echo Installing Sup $1 ...
+sudo chmod +x sup
+sudo mv sup /usr/bin/sup
+
+echo Installed Sup $1 successfully ...
+SCRIPT
+
+Vagrant.configure(2) do |config|
+
+  vmName = "sup-01"
+  config.vm.box = "bento/ubuntu-16.04"
+
+  config.vm.define vmName do |vmCfg|
+    vmCfg.vm.hostname = vmName
+    vmCfg.vm.network "private_network", type: "dhcp"
+  end
+
+  config.vm.provision "shell", inline: $script, privileged: false, args: SUP_VER
+
+  # Increase memory for Virtualbox
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "1024"
+  	vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
+  end
+
+end
