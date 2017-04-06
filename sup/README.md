@@ -7,7 +7,7 @@ implement `mtest` using `sup`.
 
 ### Hands on with sup
 
-- Title: **Run over network**
+- Title: **Settings to run commands over network**
 
 ```yaml
 networks:
@@ -16,7 +16,7 @@ networks:
         - root@myhost
 ```
 
-- Title: **Run locally**
+- Title: **Settings to run commands locally**
 - Command: ??
 
 ```yaml
@@ -31,7 +31,7 @@ commands:
         local: npm run build
 ```
 
-- Title: **Run commands in a single session**
+- Title: **How to run multiple commands in a single session**
 - Command: `sup staging lsroot`
 - Expected O/P: display the contents of /
 
@@ -42,21 +42,7 @@ commands:
       run: cd /; ls
 ```
 
-- Title: **Run each command in a separate session**
-- Command: `sup staging goroot ls`
-- Expected O/P: display the contents of $HOME
-
-```yaml
-commands:
-    goroot:
-      desc: go to root path
-      run: cd /
-    ls:
-      desc: list files
-      run: ls
-```
-
-- Title: **Run multiple commands**
+- Title: **How to trigger execution of multiple commands in serial ?**
 - Command: `sup staging deploy`
 - NOTE: 
   - Each command will be run on all hosts in parallel
@@ -103,22 +89,27 @@ commands:
 
 ## Structuring projects with sup
 
-- Query: Can we import external sup file(s) ?
-  - Answer: This is not possible
-- Instead once can follow `bootstrapping approach`
+We can follow `bootstrapping` approach to structure large projects with sup.
+This approach assumes significance, since Sup does not allow import of external
+Supfiles.
 
 > Bootstrapping is the leveraging of a small initial effort into something larger 
 and more significant.
 
-- We shall have a bootstraping Supfile
-- A bootstrap Supfile will consist of defaults & constants
-- The bootstrap Supfile will consist of a single command only called the bootstrap commad.
-- This bootstrap command will:
-  - pass all its defaults/constants & 
-  - Invoke a sup `target` command present in external supfile
-    - NOTE: A sup `target` command is an alias of multiple commands 
-  - This process of bootstrapping can be followed again in external sufile(s)
+How to employ `bootstrapping` approach ?
 
+- We shall have a Supfile referred to as a bootstrap Supfile.
+- A bootstrap Supfile will consist of defaults & constants & other common properties.
+- The bootstrap Supfile will consist of a single command referred to as the bootstrap command.
+- This bootstrap command will:
+  - Pass all its defaults, constants, etc properties to external Supfile(s).
+  - Invoke a sup command present in external Supfile:
+    - This sup command available in external Supfile is referred to as `target`.
+    - A sup `target` command is an alias of multiple commands.
+    - i.e. can invoke multiple commands in succession.
+- This process of bootstrapping can be followed again in external Supfile(s) as well.
+
+Below is a sample bootstrap Supfile
 
 ```yaml
  install-omm:

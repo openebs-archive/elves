@@ -1,19 +1,24 @@
 ## mtool
 
-`mtool` is a concept that encompasses 
-[taco bell programming](http://whatis.techtarget.com/definition/Taco-Bell-programming). 
-We are just rebranding it as `mtool`.
+`mtool` strives for declarative programming to implement a workflow. It 
+will not be another DSL library or toolkit. However, it will mention the good 
+practices to implement this declarative mode of programming.
 
-In future, we might put `mtool` concepts in `openebs` repository. The trials of 
-`mtool` concepts will be done in `elves` repository.
+The trials of `mtool` concepts will be done in specific folders within `elves` 
+repository.
 
-## mtool design concepts
+### Expressing intent of the workflow is mtool's key focus
 
-### Intent
+Express the [intent](intent.md) of your workflow in a yaml file.
 
-Express the [intent](intent.md) of your requirement in a yaml file.
+### Tools to express intent 
 
-### CLI
+- Ansible
+- [Sup](../sup/README.md)
+
+## How can one use mtool ?
+
+### As a CLI
 
 - Use a tool that can compose these test cases & expose them as a CLI
   - This CLI can be packaged & released
