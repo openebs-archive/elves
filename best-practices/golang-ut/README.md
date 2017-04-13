@@ -10,6 +10,7 @@ Topics:
   - Where do I start from ?
   - What is code coverage ?
   - How much code coverage is enough ?
+  - How do you measure code coverage ?
 ```
 
 #### Refer
@@ -17,9 +18,11 @@ Topics:
 ```yaml
 A Simple GoLang Code:
   - https://golang.org/src/strings/compare.go
-  - https://golang.org/src/strings/strings.go
-Above Code's Unit Test Code:
+However, its Unit Test Code has lots of LOC:
   - https://golang.org/src/strings/compare_test.go
+A GoLang Code with many functions:
+  - https://golang.org/src/strings/strings.go
+Unit Test Code too has similar no of functions with much more LOC:
   - https://golang.org/src/strings/strings_test.go
 ```
 
