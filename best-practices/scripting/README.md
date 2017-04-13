@@ -5,16 +5,17 @@ A contributor needs to understand &/ take care of below non-functional features:
 ### Topics - 1
 
 ```yaml
-Why & how to create a clean_up function ?
-Why & how to create a error_exit function ?
-Why & how to create safe (race free) temp files ?
-Why SIGKILL is not the best option for signal handling ?
+Topics:
+  - Why & how to create a clean_up function ?
+  - Why & how to create a error_exit function ?
+  - Why & how to create safe (race free) temp files ?
+  - Why SIGKILL is not the best option for signal handling ?
 ```
 
 #### Refer
 
 ```yaml
-Scripting Best Practices:
+Errors And Signals:
   - http://linuxcommand.org/lc3_wss0150.php
   - Errors And Signals And Traps (Oh, My!) - Part 1
   - Errors And Signals And Traps (Oh, My!) - Part 2
@@ -23,9 +24,10 @@ Scripting Best Practices:
 ### Topics - 2
 
 ```yaml
-What is linting & why is linting required ?
-Can we use a tool to lint ?
-Can the tool be integrated with Travis CI ?
+Topics:
+  - What is linting & why is linting required ?
+  - Can we use a tool to lint ?
+  - Can the tool be integrated with Travis CI ?
 ```
 
 #### Refer
@@ -42,8 +44,9 @@ lint-shell-scripts:
 ### Topics - 3
 
 ```yaml
-What is unit testing ?
-Do you unit test your scripts ?
+Topics:
+  - What is unit testing ?
+  - Do you unit test your scripts ?
 ```
 
 #### Refer
