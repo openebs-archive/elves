@@ -4,31 +4,51 @@ A contributor needs to understand &/ take care of below non-functional features:
 
 ### Topics - 1
 
-- Why & how to create a clean_up function ?
-- Why & how to create a error_exit function ?
-- Why & how to create safe (race free) temp files ?
-- Why SIGKILL is not the best option for signal handling ?
+```yaml
+Why & how to create a clean_up function ?
+Why & how to create a error_exit function ?
+Why & how to create safe (race free) temp files ?
+Why SIGKILL is not the best option for signal handling ?
+```
 
-Refer
-- [Scripting Best Practices - 1](http://linuxcommand.org/lc3_wss0150.php)
+#### Refer
+
+```yaml
+Scripting Best Practices:
+  - http://linuxcommand.org/lc3_wss0150.php
   - Errors And Signals And Traps (Oh, My!) - Part 1
   - Errors And Signals And Traps (Oh, My!) - Part 2
+```
 
 ### Topics - 2
 
-- What is linting & why is linting required ?
-- Can we use a tool to lint ?
-- Can the tool be integrated with Travis CI ?
+```yaml
+What is linting & why is linting required ?
+Can we use a tool to lint ?
+Can the tool be integrated with Travis CI ?
+```
 
-Refer:
-- [online lint](https://www.shellcheck.net/)
-- [shellcheck](https://github.com/koalaman/shellcheck)
-- [lint-shell-scripts](https://carlosbecker.com/posts/lint-shell-scripts/)
+#### Refer
+
+```yaml
+online lint:
+  - https://www.shellcheck.net/
+shellcheck:
+  - https://github.com/koalaman/shellcheck
+lint-shell-scripts:
+  - https://carlosbecker.com/posts/lint-shell-scripts/
+```
 
 ### Topics - 3
 
-- What is unit testing ?
-- Do you unit test your scripts ?
+```yaml
+What is unit testing ?
+Do you unit test your scripts ?
+```
 
-Refer:
-- [Bash Automated Testing System](https://github.com/sstephenson/bats)
+#### Refer
+
+```yaml
+Bash Automated Testing System:
+  - https://github.com/sstephenson/bats
+```
