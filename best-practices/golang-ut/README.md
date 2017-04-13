@@ -34,6 +34,14 @@ Topics:
   - What is positive testing ?
   - What is negative testing ?
   - What is value based testing ?
+  - What is table driven testing ?
+```
+
+#### Refer
+
+```yaml
+Table Driven Testing:
+  - https://dave.cheney.net/2013/06/09/writing-table-driven-tests-in-go
 ```
 
 ### Topics - 3
@@ -51,6 +59,13 @@ Topics:
 Topics:
   - What it takes to achieve 100% unit test coverage ?
   - Did you know ? A code that is not designed well cannot achieve 100% test coverage.
+```
+
+#### Refer
+
+```yaml
+Interfaces and Composition for Effective Unit Testing in GoLang: 
+  - https://nathanleclaire.com
 ```
 
 ### Topics - 5

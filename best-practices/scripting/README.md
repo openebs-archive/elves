@@ -10,6 +10,8 @@ Topics:
   - Why & how to create a error_exit function ?
   - Why & how to create safe (race free) temp files ?
   - Why SIGKILL is not the best option for signal handling ?
+  - Why quotes are important ?
+  - Did you try tracing when you are in trouble ?
 ```
 
 #### Refer
@@ -19,6 +21,7 @@ Errors And Signals:
   - http://linuxcommand.org/lc3_wss0150.php
   - Errors And Signals And Traps (Oh, My!) - Part 1
   - Errors And Signals And Traps (Oh, My!) - Part 2
+  - Stay Out Of Trouble
 ```
 
 ### Topics - 2
