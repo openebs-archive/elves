@@ -16,6 +16,7 @@ Topics:
 
 ```yaml
 Integration Testing Sample In The Age of Containers & K8s:
+  - https://github.com/kubernetes/kubernetes/tree/master/examples/cockroachdb
   - https://github.com/kubernetes/kubernetes/blob/master/examples/cockroachdb/demo.sh:
     - You may implement a simple shell script
     - You might want to write a simple .go file that has main() function
