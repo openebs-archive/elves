@@ -1,8 +1,13 @@
 ## Storage Interface
 
-Status:       In Progress
-Owners:       @amitkumardas
-Github Repo:  NA
+```yaml
+Status:
+  - In Progress
+Owners:
+  - @amitkumardas
+Github Repo:
+  - NA
+```
 
 ### Motivation
 
