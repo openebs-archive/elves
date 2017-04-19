@@ -26,5 +26,20 @@ Error Wrapping & Propagation:
 ```yaml
 Topics:
   - Do you unit test your code ?
-  - Test more than you think your should ?
+  - Test more than you think you should ?
+```
+
+### Topics - 3
+
+```yaml
+Topics:
+  - Do you think about re-using code across projects ?
+  - Have you thought of building golang files that are packaged for reuse ?
+```
+
+#### Refer
+
+```yaml
+A Utility lib from CoreOS:
+  - https://github.com/coreos/pkg
 ```
