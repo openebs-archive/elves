@@ -21,7 +21,9 @@ Integration Testing Sample In The Age of Containers & K8s:
     - You may implement a simple shell script
     - You might want to write a simple .go file that has main() function
     - You may not want another tool(s) if `kubectl` & host of K8s features suffice
-More Examples:
+As seen in ingress:
   - https://github.com/kubernetes/ingress/tree/master/examples
+This is how K8s/DNS Does:
+  - https://github.com/kubernetes/dns/tree/master/pkg/e2e
 ```
 
