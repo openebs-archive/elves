@@ -1,0 +1,108 @@
+---
+- hosts: maya-master
+  
+  vars_files:
+    - variables/vars.yml #Import variables from external file.
+
+  tasks:
+
+    - name: Set flag
+      set_fact:
+        flag: "Succeeded"
+
+    - name: Get Volume Info
+      shell: source ~/.profile; maya vsm-stats {{openebs_vol_name}}
+      args:
+        executable: /bin/bash
+      register: result
+      until: "'Portal' in result.stdout"
+      delay: 10
+      retries: 3
+      ignore_errors: yes
+
+    - name: Set flag
+      set_fact:
+        flag: "failed"
+      when: result|failed
+
+    - name: Query Target Portal
+      shell: "echo {{result.stdout_lines[4]}} | grep -i 'portal' | awk '{print $2}'"
+      register: result
+      ignore_errors: yes
+
+    - name: Set flag
+      set_fact:
+        flag: "failed"
+      when: result|failed
+
+    - name: Update Target Portal
+      set_fact:
+        openebs_target_portal: "{{result.stdout}}"
+      ignore_errors: yes
+
+    - name: Set flag
+      set_fact:
+        flag: "failed"
+      when: result|failed
+
+    - name: Results
+      fail: 
+        msg: "The tests have failed because of errors."
+      when: flag == "failed"
+
+  - hosts: localhost
+
+    vars_files:
+    - variables/vars.yml #Import variables from external file.
+
+    become: true
+
+    tasks:
+    # Discover the target from iSCSI portal & login
+    - open_iscsi:
+        show_nodes: yes        
+        portal: "{{ hostvars['maya-master']['openebs_target_portal'] }}"
+        discover: yes
+        login: yes
+
+    # Identify block device corresponding to the target
+
+    - name: Identify block device
+      shell: "iscsiadm -m session -P 3 | grep 'Attached scsi disk' | awk '{print $4}'"
+      register: device
+    - debug: var=device.stdout
+
+    # Create ext4 filesystem on the iSCSI target device
+
+    - filesystem:
+        fstype: ext4
+        dev: /dev/{{device.stdout}}
+        force: no
+
+    # Mount device by label on specified path
+
+    - name: Mount device by label
+      mount:
+        name: /mnt/iscsi
+        src: /dev/{{device.stdout}}
+        fstype: ext4
+        opts: discard,_netdev
+        state: mounted
+
+    - name: fio docker image pull
+      docker_image:
+
+          # Ansible substitutes variable as list, convert to str
+          name: "{{openebs_container}}"
+          state: present
+          # Will always pull latest image
+          pull: true
+          timeout: 120
+
+    - name: fio docker instantiate
+      docker_container:
+          name: fio-runner
+          image: "{{openebs_container}}"
+          volumes:
+            - /mnt/iscsi:/datadir1
+          state: started  

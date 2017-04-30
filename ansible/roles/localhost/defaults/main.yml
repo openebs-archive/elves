@@ -1,0 +1,8 @@
+---
+deb_packages:
+  - docker.io
+
+pip_packages:
+  - 'docker-py==1.9.0'
+  - paramiko
+  - configparser

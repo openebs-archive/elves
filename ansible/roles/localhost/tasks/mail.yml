@@ -1,0 +1,16 @@
+---
+- name: Install APT Packages 
+  apt: 
+    name: "{{item}}" 
+    state: present
+  with_items:
+    - docker.io
+    - fio
+  become: true
+
+- name: Install PIP Packages
+  pip: 
+    name: "{{ item }}" 
+    state: present
+  with_items: "{{ pip_packages }}"
+  become: true

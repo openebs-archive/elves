@@ -1,0 +1,23 @@
+---
+- hosts: localhost
+
+  pre_tasks:
+  - name: Generate Inventory
+    script: generate-inventory.py ../inventory/machine.in
+
+  #- hosts: openebs-mayamaster
+
+  #roles:
+  #  - master
+
+  #- hosts: openebs-mayahosts
+
+  #roles:
+  #  - hosts
+
+  #- hosts: localhost
+
+  #roles:
+  #  - localhost
+  #  - volume
+

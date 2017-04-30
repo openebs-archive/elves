@@ -1,0 +1,25 @@
+---
+#Option specifically for vagrant VMs.
+#Accepted Entries(true, false)
+
+is_vagrant_vm: false
+  
+#User-defined name for the volume that openebs creates:
+#Accepted Entries(meaningful strings)
+
+openebs_vol_name: myjivavol
+
+#User-defined size for the volume that openebs creates:
+#Accepted Entries(integers)
+
+openebs_vol_size: 5
+
+#Available CIDR for allocating IP Addresses for containers
+#Accepted Entries (Valid CIDR)
+
+cn_network_cidr: 20.10.26.10/24
+
+#Network interface for CIDR.
+#Accepted Entries (Valid Network Interface)
+
+cn_interface: enp0s3
