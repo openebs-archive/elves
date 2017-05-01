@@ -11,7 +11,7 @@
     backup: yes
   become: true
 
-  #- name: Update INI file
+- name: Update INI file
   ini_file:
     path: /etc/mayaserver/orchprovider/nomad_global.INI
     section: datacenter "dc1"

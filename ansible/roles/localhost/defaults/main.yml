@@ -1,6 +1,7 @@
 ---
-deb_packages:
+deb_local_packages:
   - docker.io
+  - fio
 
 pip_packages:
   - 'docker-py==1.9.0'
