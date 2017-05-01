@@ -4,7 +4,7 @@
   args:
     executable: /bin/bash
   when: openebs_vol_size|int >=1
-  delegate_to: "{{hostvars[groups['openebs-mayamaster'][0]]['ansible_ssh_host']}}"
+  delegate_to: "{{groups['openebs-mayamaster'].0}}" 
 
 - name: Get Volume Info
   shell: source ~/.profile; maya vsm-stats {{openebs_vol_name}}
@@ -14,7 +14,7 @@
   until: "'Portal' in result.stdout"
   delay: 10
   retries: 3
-  delegate_to: "{{hostvars[groups['openebs-mayamaster'][0]]['ansible_ssh_host']}}"
+  delegate_to: "{{groups['openebs-mayamaster'].0}}" 
 
 - name: Fetch Target Portal
   shell: "echo {{result.stdout_lines[4]}} | grep -i 'portal' | awk '{print $2}'"
@@ -23,3 +23,5 @@
 - name: Update Target Portal
   set_fact:
     openebs_target_portal: "{{result.stdout}}"
+  delegate_to: "{{groups['openebs-mayamaster'].0}}"
+  delegate_facts: true

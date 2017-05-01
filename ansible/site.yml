@@ -21,4 +21,5 @@
   roles:
     - localhost 
     - volume
+    - fio
 

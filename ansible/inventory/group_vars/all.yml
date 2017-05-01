@@ -17,9 +17,9 @@ openebs_vol_size: 5
 #Available CIDR for allocating IP Addresses for containers
 #Accepted Entries (Valid CIDR)
 
-cn_network_cidr: 20.10.26.10/24
+cn_network_cidr: 172.28.128.1/24 
 
 #Network interface for CIDR.
 #Accepted Entries (Valid Network Interface)
 
-cn_interface: enp0s3
+cn_interface: enp0s8
