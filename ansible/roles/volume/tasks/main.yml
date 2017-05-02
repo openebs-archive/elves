@@ -3,7 +3,6 @@
   shell: source ~/.profile; maya vsm-create -name={{openebs_vol_name}} -size={{openebs_vol_size}}
   args:
     executable: /bin/bash
-  when: openebs_vol_size|int >=1
   delegate_to: "{{groups['openebs-mayamaster'].0}}" 
 
 - name: Get Volume Info

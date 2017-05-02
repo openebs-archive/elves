@@ -5,6 +5,10 @@
     portal: "{{hostvars[groups['openebs-mayamaster'][0]]['openebs_target_portal']}}"
     discover: yes
     login: yes
+  register: result
+  until: "'iqn' in result.nodes[0]"
+  retries: 6
+  delay: 10
   become: true
 
 - name: Identify Block Device

@@ -10,9 +10,9 @@ is_vagrant_vm: false
 openebs_vol_name: myjivavol
 
 #User-defined size for the volume that openebs creates:
-#Accepted Entries(integers)
+#Accepted Entries(Valid Volume Sizes)
 
-openebs_vol_size: 5
+openebs_vol_size: 5G
 
 #Available CIDR for allocating IP Addresses for containers
 #Accepted Entries (Valid CIDR)

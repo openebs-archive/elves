@@ -2,5 +2,5 @@
 - name: Restart M_APIServer
   service:
     name: m-apiserver
-    state: started
+    state: restarted
     enabled: yes

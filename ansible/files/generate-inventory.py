@@ -8,6 +8,7 @@ import argparse
 import configparser
 import warnings
 import paramiko
+import re
 
 def getLocalKey(cmd, path):
     """ Uses ssh-keygen command to generate id_rsa.pub on localhost """
@@ -82,7 +83,20 @@ def generateInventory(boxlist, path):
             config[varsgroupname] = {'ansible_ssh_user': h_user}
             config[varsgroupname]['ansible_ssh_pass'] = h_passwd
             config[varsgroupname]['ansible_ssh_extra_args'] = "'-o StrictHostKeyChecking=no'"
-    logging.info ("******** Inventory config generated successfully ********") 
+    logging.info ("******** Inventory config generated successfully ********")
+
+def replace(file, pattern, subst):
+    """ Replace extra spaces around assignment operator in inventory """
+
+    file_handle = open(file, 'rb')
+    file_string = file_handle.read()
+    file_handle.close()
+
+    file_string = (re.sub(pattern, subst, file_string))
+
+    file_handle = open(file, 'wb')
+    file_handle.write(file_string)
+    file_handle.close()
 
 def main():
     
@@ -130,7 +144,7 @@ def main():
         config.read_file(open(ansible_cfg_path))
         inventory_path = ansible_path + config.get('defaults', 'inventory')
     except:
-        if os.path.isdir(default_inventory_path != true):
+        if os.path.isdir(default_inventory_path) != True:
            os.makedirs(default_inventory_path)
 	inventory_path = default_inventory_path + 'hosts'
 
@@ -173,6 +187,9 @@ def main():
    
     # Generate Ansible hosts file from 'machines.in'
     generateInventory(HostList, inventory_path)
+
+    # Sanitize the Ansible inventory file
+    replace(inventory_path, " = ", "=" )
 
 if __name__=="__main__":
     main()
