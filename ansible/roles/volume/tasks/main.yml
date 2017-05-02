@@ -10,9 +10,9 @@
   args:
     executable: /bin/bash
   register: result
-  until: "'Portal' in result.stdout"
-  delay: 10
-  retries: 3
+  until: "'Online' in result.stdout"
+  delay: 60
+  retries: 10
   delegate_to: "{{groups['openebs-mayamaster'].0}}" 
 
 - name: Fetch Target Portal
