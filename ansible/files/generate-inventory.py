@@ -136,9 +136,9 @@ def main():
     key_gen_cmd = 'echo -e  "y\n"|ssh-keygen -q -t rsa -N "" -f ~/.ssh/id_rsa'
 
     # Specify path for inventory
-    ansible_path = os.path.dirname(os.path.realpath(sys.argv[0])).rstrip('files')
+    ansible_path = os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[0])))
     ansible_cfg_path = ansible_path + 'ansible.cfg'
-    default_inventory_path = ansible_path + 'inventory/'
+    default_inventory_path = ansible_path + '/inventory/'
     config = configparser.ConfigParser()
     try:
         config.read_file(open(ansible_cfg_path))
