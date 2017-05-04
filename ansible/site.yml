@@ -22,4 +22,5 @@
     - {role: localhost, when: run_demo | bool} 
     - {role: volume, when: run_demo | bool}
     - {role: fio, when: run_demo | bool}
+    - {role: cleanup, when: run_demo | bool}
 

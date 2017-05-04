@@ -9,11 +9,6 @@ run_demo: true
 
 is_vagrant_vm: false
   
-#User-defined name for the volume that openebs creates:
-#Accepted Entries(meaningful strings): default:myjivavol
-
-openebs_vol_name: myjivavol
-
 #User-defined size for the volume that openebs creates:
 #Accepted Entries(Valid Volume Sizes): default:5G
 
