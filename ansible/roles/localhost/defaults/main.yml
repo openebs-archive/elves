@@ -1,6 +1,7 @@
 ---
 deb_local_packages:
   - docker.io
+  - open-iscsi
   - fio
 
 pip_local_packages:
