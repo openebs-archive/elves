@@ -152,6 +152,11 @@ The following actions are carried out upon running the playbook :
 - Container to launch FIO is instantiated
 - Cleanup is performed post user confirmation
 
+### LIMITATIONS
+
+Currently, the playbooks are written to work with Ubuntu hosts. They will be enhanced to work on other
+linux flavours soon.
+
 ### SWITCHES AND LATCHES
 
 - Use `-v` flag while running the playbook to enable verbose logging. 
