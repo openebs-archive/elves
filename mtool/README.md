@@ -27,6 +27,7 @@ Some of the benefits:
 - Ansible
 - [Sup](../sup/README.md)
 - [Alfred](https://github.com/kcmerrill/alfred/)
+- [MCM](https://github.com/zombiezen/mcm)
 
 ## Extending the reach of this declarative taskrunner ?
 
