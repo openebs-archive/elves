@@ -75,7 +75,6 @@ def generateInventory(boxlist, path):
             elif c > 1:
                 hostaliasname = 'maya%s0%s ansible_ssh_host' %(i[0], c)
                 config[hostgroupname][hostaliasname] = i[1]
-                #with open('inventory.cfg', 'w') as configfile:
                 with open(path, 'w') as configfile:
                     config.write(configfile)
                 c = c + 1
@@ -115,21 +114,7 @@ def main():
     args = parser.parse_args()
 
     Hosts = args.hostfile
-    
-    # Define logging levels for script execution
-    logfile = sys.argv[0].split('.py')[0] + '.log'
-    
-    if args.loglevel and args.loglevel.upper() == "DEBUG":
-        logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',\
-                filename=logfile,filemode='a',level=10)
-    else:
-        logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',\
-                filename=logfile,filemode='a',level=20)
-
-    # Initiate log file
-    clearLogCmd = '> %s' %(logfile)
-    executeCmd(clearLogCmd)
-
+   
     # Specify SSH details 
     key_rsa_path = '~/.ssh/id_rsa.pub'
     key_append_path = '~/.ssh/authorized_keys'
@@ -147,7 +132,21 @@ def main():
         if os.path.isdir(default_inventory_path) != True:
            os.makedirs(default_inventory_path)
 	inventory_path = default_inventory_path + 'hosts'
+    
+    # Define logging levels for script execution
+    logfile = '%s/host-status.log' %(default_inventory_path)
+    
+    if args.loglevel and args.loglevel.upper() == "DEBUG":
+	logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',\
+		filename=logfile,filemode='a',level=10)
+    else:
+	logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',\
+		filename=logfile,filemode='a',level=20)
 
+    # Initiate log file
+    clearLogCmd = '> %s' %(logfile)
+    executeCmd(clearLogCmd)
+      
     # Create list of tuples containing individual machine info
     HostList = []
     with open(Hosts, "rb") as fp:

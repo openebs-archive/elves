@@ -17,10 +17,15 @@
 
 - name: Fetch Target Portal
   shell: "echo {{result.stdout_lines[4]}} | grep -i 'portal' | awk '{print $2}'"
-  register: result
+  register: result_portal
 
-- name: Update Target Portal
+- name: Fetch Target IQN
+  shell: "echo {{result.stdout_lines[2]}} | grep -i 'iqn' | awk '{print $2}'"
+  register: result_iqn
+
+- name: Update Target Details
   set_fact:
-    openebs_target_portal: "{{result.stdout}}"
+    openebs_target_portal: "{{result_portal.stdout}}"
+    openebs_target_iqn: "{{result_iqn.stdout}}"
   delegate_to: "{{groups['openebs-mayamaster'].0}}"
   delegate_facts: true
