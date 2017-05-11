@@ -124,14 +124,15 @@ A brief outline of the functions associated with above components is described b
    
 ### INSTALLATION
 
+The pre-requisites include availability of at-least four linux machines (VMs OR bare-metal boxes,
+to be used as client, Maya-master server, at least two OpenEBS storage hosts respectively) with 
+basic development packages, SSH service & ansible (version >= 2.3) installed (ansible in turn needs 
+python-minimal on the boxes as a pre-requisite). 
+
 The ansible based CI-CD framework for openebs can be installed via a git clone of the elves 
-repository (openebs/elves/ansible). 
+repository (openebs/elves/ansible) into the client machine 
 
 `git clone https://github.com/openebs/elves.git`
-
-The pre-requisites include availability of at-least four linux machines (VMs OR bare-metal boxes) 
-with basic development packages, SSH service & ansible (version >= 2.3) installed 
-(ansible in turn needs python-minimal on the boxes as a pre-requisite).
 
 ### USAGE
 
