@@ -36,6 +36,7 @@ job "demo-vsm" {
 			config {
 				image = "openebs/jiva:latest"
                                 network_mode = "host"
+                                privileged = true
 				command = "launch"
 				args = [ 
                                          "controller", 
