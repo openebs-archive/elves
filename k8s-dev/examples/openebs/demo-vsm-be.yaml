@@ -1,36 +1,28 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: my-jiva-vsm-rep
-  labels:
-    openebs/provisioner-type: jiva
-    vsm: my-jiva-vsm
+  name: demo-vsm-be
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-      vsm: my-jiva-vsm
   template:
     metadata:
       labels:
-        vsm: my-jiva-vsm
+        app: demo-vsm-be
     spec:
       containers:
-      - name: my-jiva-vsm-rep-con
+      - name: demo-vsm-be
         image: openebs/jiva:latest
         ports:
         - containerPort: 9502
-          protocol: TCP
         - containerPort: 9503
-          protocol: TCP
         - containerPort: 9504
-          protocol: TCP
         command: ["launch"]
-        args: ["replica", "--frontendIP", "10.107.22.240", "--size", "1G", "/openebs"]
+        args: ["replica", "--frontendIP", "10.101.64.185", "--size", "1G", "/store"]
         volumeMounts:
-        - mountPath: /openebs
-          name: openebs
+        - mountPath: /store
+          name: be-store
       volumes:
-      - name: openebs
+      - name: be-store
         hostPath:
-          path: /tmp/my-jiva-vsm/openebs
+          path: /tmp/vsm/store1
+
