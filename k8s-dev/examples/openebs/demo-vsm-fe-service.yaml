@@ -6,7 +6,6 @@ metadata:
     openebs/provisioner-type: jiva
     vsm: my-jiva-vsm
 spec:
-  clusterIP: 10.107.22.240
   ports:
   - name: iscsi
     port: 3260
