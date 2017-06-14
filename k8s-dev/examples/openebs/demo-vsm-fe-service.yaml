@@ -1,15 +1,24 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: demo-vsm-fe-service
+  name: my-jiva-vsm-ctrl-svc
   labels:
-    app: demo-vsm-fe-service
+    openebs/provisioner-type: jiva
+    vsm: my-jiva-vsm
 spec:
+  clusterIP: 10.107.22.240
   ports:
-    # the port that this service should serve on
-  - port: 3260
-    name: "iscsi"
-  - port: 9501
-    name: "api"
+  - name: iscsi
+    port: 3260
+    protocol: TCP
+    targetPort: 3260
+  - name: api
+    port: 9501
+    protocol: TCP
+    targetPort: 9501
   selector:
-    app: demo-vsm-fe
+    vsm: my-jiva-vsm-ctrl
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
