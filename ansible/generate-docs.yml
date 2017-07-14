@@ -1,0 +1,30 @@
+---
+# Author: ksatchit
+# Description: This playbook installs ansible-docgen & generates usage docs for roles and playbooks
+
+- hosts: localhost
+  tasks:
+    - name: Install ansible-docgen python package
+      pip: 
+        name: ansible-docgen
+        state: present
+      become: true 
+        
+    - name: Get the location of ansible-docgen lib
+      command: python -c "import os,ansibledocgen; print(os.path.dirname(ansibledocgen.__file__))"
+      register: docgen_loc
+
+    - name: Change the markdown file name in the formatter from 'README' to 'usagedoc'
+      replace:
+        path: "{{ docgen_loc.stdout }}/formatter/markup.py"
+        regexp: 'README'
+        replace: 'usagedoc'
+        backup: yes
+      become: true
+
+    - name: Execute the doc generation command
+      command: ansible-docgen 
+      register: result 
+
+
+       
