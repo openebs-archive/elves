@@ -16,4 +16,4 @@ spec:
         - containerPort: 3260
         - containerPort: 9501
         command: ["launch"]
-        args: ["controller", "--frontend", "gotgt", "demo-vol1"]
+        args: ["controller", "--frontend", "gotgt", "--clusterIP", "10.107.12.133",  "demo-vol1"]

@@ -1,0 +1,24 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: my-jiva-vsm-ctrl
+  labels:
+    openebs/provisioner-type: jiva
+    vsm: my-jiva-vsm
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        vsm: my-jiva-vsm-ctrl
+    spec:
+      containers:
+      - name: my-jiva-vsm-ctrl-con
+        image: openebs/jiva:latest
+        ports:
+        - containerPort: 3260
+          protocol: TCP
+        - containerPort: 9501
+          protocol: TCP
+        command: ["launch"]
+        args: ["controller", "--frontend", "gotgt", "--clusterIP", "10.107.12.133", "my-jiva-vsm"]

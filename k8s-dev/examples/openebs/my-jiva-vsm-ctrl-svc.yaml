@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-jiva-vsm-ctrl-svc
+  labels:
+    openebs/provisioner-type: jiva
+    vsm: my-jiva-vsm
+spec:
+  ports:
+  - name: iscsi
+    port: 3260
+    protocol: TCP
+    targetPort: 3260
+  - name: api
+    port: 9501
+    protocol: TCP
+    targetPort: 9501
+  selector:
+    vsm: my-jiva-vsm-ctrl
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
