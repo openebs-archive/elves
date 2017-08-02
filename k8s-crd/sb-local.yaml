@@ -1,0 +1,8 @@
+apiVersion: "openebs.io/v1alpha1"
+kind: StorageBackend
+metadata:
+  name: my-new-storage-backend
+  type: local
+spec:
+  disk: "/dev/sdc"
+  format: "ext4"
