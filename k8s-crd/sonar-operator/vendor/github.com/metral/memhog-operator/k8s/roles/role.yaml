@@ -1,0 +1,33 @@
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1alpha1
+metadata:
+  name: default-service-account
+rules:
+- apiGroups:
+  - "*"
+  resources:
+  - "*"
+  verbs:
+  - "*"
+- nonResourceURLs:
+  - "*"
+  verbs:
+  - "*"
+
+---
+
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1alpha1
+metadata:
+  name: default-service-account
+subjects:
+  # The subject is the target service account
+  - kind: ServiceAccount
+    name: default
+    namespace: default
+roleRef:
+  # The roleRef specifies the role to give to the
+  # service account.
+  kind: ClusterRole
+  name: default-service-account # Tectonic also provides "readonly", "user", and "admin" cluster roles.
+  apiGroup: rbac.authorization.k8s.io

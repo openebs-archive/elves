@@ -1,0 +1,7 @@
+apiVersion: "kubedemo.com/v1alpha1"
+kind: Submarine
+metadata:
+  name: uss-dolphin-agss-555
+  type: Dolphin
+spec:
+  nation: "USA"

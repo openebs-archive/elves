@@ -1,0 +1,7 @@
+apiVersion: extensions/v1beta1
+kind: ThirdPartyResource
+metadata:
+  name: app-monitor.kubedemo.com
+description: "Allow user to create an app monitor to supervise the app and the resources it needs."
+versions:
+  - name: v1
