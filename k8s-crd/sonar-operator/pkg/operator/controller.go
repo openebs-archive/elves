@@ -1,20 +1,15 @@
 package operator
 
 import (
-	"context"
-	"fmt"
 	"os"
-	"reflect"
 	"time"
 
-	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/pkg/api"
-	"k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 
@@ -55,7 +50,7 @@ type SubmarineControllerInformer struct {
 }
 
 // Create a new Controller for the Submarine operator
-func NewSubmarineController(kubeconfig, namespace) (
+func NewSubmarineController(kubeconfig, namespace string) (
 	*SubmarineController, error) {
 
 	// Create the client config for use in creating the k8s API client
@@ -252,7 +247,8 @@ func (sc *SubmarineController) run() {
 		glog.Errorf("No Submarines to list.")
 		return
 	}
-	sub := subs[0]
+
+	glog.V(2).Infof("Found %d submarine(s)", len(subs))
 
 	//TODO - Include the logic to raise an Event
 

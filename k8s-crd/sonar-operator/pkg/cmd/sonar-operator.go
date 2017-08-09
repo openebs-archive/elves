@@ -20,7 +20,7 @@ var (
 )
 
 // Define a type for the options of SonarOperator
-type SonarOperatorOption struct {
+type SonarOperatorOptions struct {
 	KubeConfig     string
 	Namespace      string
 }

@@ -19,7 +19,7 @@ const Version string = "v1alpha1"
 
 // An Submarine redeploys an app when resource limits are exceeded.
 type SubmarineSpec struct {
-	nation string `json:nation`
+	Nation string `json:nation`
 }
 
 // #############################################################################

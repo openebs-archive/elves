@@ -271,8 +271,8 @@ func (sub *Submarine) testCreate(kubecfg *rest.Config, namespace string) {
 	err = client.Get().
 		Resource(ResourceNamePlural).
 		Namespace(namespace).
-		Name(am.Metadata.Name).
-		Do().Into(am)
+		Name(sub.Metadata.Name).
+		Do().Into(sub)
 
 	if err != nil {
 		// Create the Submarine if it doesn't already exist
@@ -284,7 +284,7 @@ func (sub *Submarine) testCreate(kubecfg *rest.Config, namespace string) {
 				err = client.Post().
 					Resource(ResourceNamePlural).
 					Namespace(namespace).
-					Body(am).
+					Body(sub).
 					Do().Into(&result)
 
 				if err != nil {

@@ -32,13 +32,12 @@ deps:
 	glide install -v
 
 build: $(shell find . -name "*.go")
-	CGO_ENABLED=0 go build -a -ldflags '-extldflags "-static"' -o cr-controller .
+	CGO_ENABLED=0 go build -a -ldflags '-extldflags "-static"' -o sonar-operator .
 
 image: 
-	@cp cr-controller buildscripts/docker/
-	@cd buildscripts/docker && sudo docker build -t openebs/cr-controller:ci .
+	@cp sonar-operator buildscripts/docker/
+	@cd buildscripts/docker && sudo docker build -t openebs/sonar-operator:ci .
 	@sh buildscripts/push
 
 clean:
-	rm -rf vendor
-	rm cr-controller
+	rm sonar-operator
