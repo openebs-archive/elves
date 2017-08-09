@@ -1,0 +1,7 @@
+apiVersion: "kubedemo.com/v1alpha1"
+kind: Submarine
+metadata:
+  name: moby-dick
+  type: Whale
+spec:
+  nation: "Japan"
