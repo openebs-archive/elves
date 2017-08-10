@@ -2,6 +2,7 @@ package operator
 
 import (
 	"os"
+	"reflect"
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -74,19 +75,19 @@ func NewSubmarineController(kubeconfig, namespace string) (
 	// TODO - Use this block to check that CRD already exists
 	// Create & register the Submarine resource as a CRD in the cluster, if it
 	// doesn't exist
-	//kind := reflect.TypeOf(Submarine{}).Name()
-	//glog.V(2).Infof("Registering CRD: %s.%s | version: %s", CRDName, Domain, Version)
-	//_, err = crd.CreateCustomResourceDefinition(
-	//	apiextensionsClientSet,
-	//	CRDName,
-	//	Domain,
-	//	kind,
-	//	ResourceNamePlural,
-	//	Version,
-	//)
-	//if err != nil {
-	//	return nil, err
-	//}
+	kind := reflect.TypeOf(Submarine{}).Name()
+	glog.V(2).Infof("Checking CRD: %s.%s | version: %s", CRDName, Domain, Version)
+	_, err = utils.HasCustomResourceDefinition(
+		apiextensionsClientSet,
+		CRDName,
+		Domain,
+		kind,
+		ResourceNamePlural,
+		Version,
+	)
+	if err != nil {
+		return nil, err
+	}
 
 	// Discover or set the namespace in which this controller is running in
 	if namespace == "" {
