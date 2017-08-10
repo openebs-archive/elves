@@ -189,10 +189,27 @@ func (sc *SubmarineController) newSubmarineInformer() (cache.Store, cache.Contro
 		5*time.Second,
 		// Callback functions for add, delete & update events
 		cache.ResourceEventHandlerFuncs{
-			// AddFunc: func(o interface{}) {}
+			AddFunc: sc.handleSubmarinesAdd,
 			UpdateFunc: sc.handleSubmarinesUpdate,
-			// DeleteFunc: func(o interface{}) {}
+			DeleteFunc: sc.handleSubmarinesDelete,
 		},
+	)
+}
+
+// Callback for new objects to an Submarine Informer
+func (sc *SubmarineController) handleSubmarinesAdd(newObj interface{}) {
+	// Make a copy of the object, to not mutate the original object from the local
+	// cache store
+	sub, err := CopyObjToSubmarine(newObj)
+	if err != nil {
+		glog.Errorf("Failed to copy Submarine object: %v", err)
+		return
+	}
+
+	glog.V(2).Infof("Received notification for new Submarine: %s | "+
+		"nation=%s ",
+		sub.Metadata.Name,
+		sub.Spec.Nation,
 	)
 }
 
@@ -207,6 +224,23 @@ func (sc *SubmarineController) handleSubmarinesUpdate(oldObj, newObj interface{}
 	}
 
 	glog.V(2).Infof("Received update for Submarine: %s | "+
+		"nation=%s ",
+		sub.Metadata.Name,
+		sub.Spec.Nation,
+	)
+}
+
+// Callback for delete to an Submarine Informer
+func (sc *SubmarineController) handleSubmarinesDelete(oldObj interface{}) {
+	// Make a copy of the object, to not mutate the original object from the local
+	// cache store
+	sub, err := CopyObjToSubmarine(oldObj)
+	if err != nil {
+		glog.Errorf("Failed to copy Submarine object: %v", err)
+		return
+	}
+
+	glog.V(2).Infof("Received notification for delete Submarine: %s | "+
 		"nation=%s ",
 		sub.Metadata.Name,
 		sub.Spec.Nation,
@@ -234,10 +268,6 @@ func (sc *SubmarineController) run() {
 	// Select the Submarine for the Namespace
 	// #########################################################################
 
-	// Use the first Submarine found as the operator currently
-	// only supports a single Submarine per Namespace.
-	// TODO (fix): This arbitrarily selects the first Submarine from the
-	// list in the store. Order is not guaranteed.
 	subListObj := sc.informer.submarineStore.List()
 	subs, err := CopyObjToSubmarines(subListObj)
 	if err != nil {
