@@ -1,0 +1,105 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+Vagrant.require_version ">= 1.6.0"
+
+# just a single e2e node is required
+NODES = ENV['NODES'] || 1
+
+# Memory & CPUs
+MEM = ENV['MEM'] || 1024
+CPUS = ENV['CPUS'] || 1
+
+# Common installation stuff
+$installer = <<SCRIPT
+#!/bin/bash
+
+echo Will run the common installer script ...
+
+# Update apt and get dependencies
+sudo apt-get update
+sudo apt-get install -y zip unzip curl wget
+
+SCRIPT
+
+# Setting up the e2e devlopment & compilation related stuff
+$e2edev = <<SCRIPT
+#!/bin/sh
+
+cd /opt/gopath/src/github.com/openebs/elves/e2e
+
+# Install go development & compilation
+bash buildscripts/install_go.sh
+
+# cd into the e2e working directory when we login to the VM
+# A bit of conditional logic s.t. we do not repeat cd-ing
+grep "cd /opt/gopath/src/github.com/openebs/elves/e2e" /home/vagrant/.profile || \
+  echo "cd /opt/gopath/src/github.com/openebs/elves/e2e" >> /home/vagrant/.profile
+
+# Install go dependencies i.e. vendoring
+echo "Run below command to get started with development:"
+echo "make init"
+SCRIPT
+
+required_plugins = %w(vagrant-cachier vagrant-vbguest)
+
+required_plugins.each do |plugin|
+  need_restart = false
+  unless Vagrant.has_plugin? plugin
+    system "vagrant plugin install #{plugin}"
+    need_restart = true
+  end
+  exec "vagrant #{ARGV.join(' ')}" if need_restart
+end
+
+
+def configureVM(vmCfg, hostname, cpus, mem)
+
+  vmCfg.vm.box = "bento/ubuntu-16.04"
+  
+  vmCfg.vm.hostname = hostname
+  vmCfg.vm.network "private_network", type: "dhcp"
+
+  #Adding Vagrant-cachier
+  if Vagrant.has_plugin?("vagrant-cachier")
+     vmCfg.cache.scope = :machine
+     vmCfg.cache.enable :apt
+     vmCfg.cache.enable :gem
+  end
+  
+  # Set resources w.r.t Virtualbox provider
+  vmCfg.vm.provider "virtualbox" do |vb|
+    vb.memory = mem
+    vb.cpus = cpus
+    vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
+  end
+  
+  # sync your laptop's development with this Vagrant VM
+  vmCfg.vm.synced_folder '.', '/opt/gopath/src/github.com/openebs/elves/e2e'
+
+  # Script will make some directories before installation procedure
+  vmCfg.vm.provision "shell", inline: $installer, privileged: false 
+  vmCfg.vm.provision "shell", inline: $e2edev, privileged: false
+  
+  return vmCfg
+end
+
+# Entry point of this Vagrantfile
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  # I do not want this
+  config.vbguest.auto_update = false
+  
+  1.upto(NODES.to_i) do |i|
+    hostname = "e2e-%02d" % [i]
+    cpus = CPUS
+    mem = MEM
+    
+    config.vm.define hostname do |vmCfg|
+      vmCfg = configureVM(vmCfg, hostname, cpus, mem)  
+    end
+  end
+
+end
