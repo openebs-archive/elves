@@ -1,0 +1,79 @@
+---
+###################################
+# Test host-specific(minion) params  
+###################################
+
+#Deb packages to be installed on hosts
+
+deb_packages:
+  - open-iscsi
+  - python-pip
+
+#Python packages to be installed on hosts
+pip_packages:
+  - docker-py
+
+#Minion credentials to perform rsync (directory copies) 
+
+minion_user: "{{hostvars[groups['kubernetes-kubeminions'][0]]['ansible_ssh_user']}}"
+
+minion_host: "{{hostvars[groups['kubernetes-kubeminions'][0]]['ansible_ssh_host']}}"
+
+#Storage mount point on host 
+
+data_dir: /mnt/iscsivol
+
+#Logs directory on host
+
+log_dir: /mnt/logs
+
+###################################
+# Benchmark tool-specific params 
+###################################
+
+#Tool used to perform synthetic workloads
+#Accepted Entries (fio, vdbench): default: fio 
+
+benchmark_tool: fio 
+
+#fio test container image
+
+fio_image: fio_perf_bench
+
+#vdbench test container image
+
+vdbench_image: vdbench_perf_bench
+
+#Auxiliary fio test files transferred to host
+
+fio_files:
+  - Dockerfile
+  - fio-runner.sh
+
+#Auxiliary vdbench test files transferred to host
+
+vdbench_files:
+  - Dockerfile
+  - vdbench-runner.sh
+  - vdb2gnuplot.sh
+
+##################################
+# Benchmark test-specific params
+##################################
+
+#Storage backend type
+#Accepted Entries (local, jiva, cstor): default: jiva
+
+#storage_backend: jiva 
+  
+#Storage definition (Kubernetes)
+
+volume_def: test-pvc.yaml
+
+#IO workload template 
+#Accepted Entries (basic, standard, user): default: basic
+
+workload_template: basic
+
+
+

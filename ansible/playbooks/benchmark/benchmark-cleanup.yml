@@ -1,0 +1,68 @@
+---
+
+- name: Get number of templates to run 
+  shell: ls templates/{{workload_template}} | wc -l
+  register: template_count
+
+- name: Wait until bench container exits
+  shell: docker ps -af name={{ fio_image }} | grep {{ fio_image }} 
+  args: 
+    executable: /bin/bash
+  register: result
+  become: true  
+  delegate_to: "{{groups['kubernetes-kubeminions'].0}}" 
+  until: "'Exited' in result.stdout_lines[0]"
+  delay: 300 
+  retries: "{{template_count.stdout}}"
+  when: benchmark_tool == 'fio'
+
+- name: Wait until bench container exits
+  shell: docker ps -af name={{ vdbench_image }} | grep {{ vdbench_image }}
+  args: 
+    executable: /bin/bash
+  register: result
+  become: true  
+  delegate_to: "{{groups['kubernetes-kubeminions'].0}}" 
+  until: "'Exited' in result.stdout_lines[0]"
+  delay: 300
+  retries: "{{template_count.stdout}}"
+  when: benchmark_tool == 'vdbench'
+
+- name: Unmount the ext4 filesystem 
+  mount: 
+    name: "{{ data_dir }}" 
+    state: absent
+  become: true
+  delegate_to: "{{groups['kubernetes-kubeminions'].0}}" 
+
+- name: Tear down the iSCSI sessions
+  open_iscsi: 
+    login: no
+    portal: "{{ portal_ip }}"
+    target: "{{ target_iqn }}"
+  become: true 
+  delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
+- name: Remove stale node entries for iSCSI target
+  shell: iscsiadm -m node -T {{ target_iqn }} -o delete 
+  become: true 
+  delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+  
+- name: Delete the iSCSI target 
+  shell: source ~/.profile; kubectl delete -f {{ volume_def }}
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Confirm the iSCSI target has been deleted
+  shell: source ~/.profile; kubectl get pods
+  args:
+    executable: /bin/bash
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+  register: result
+  until: "'pvc' not in result.stdout"
+  delay: 120 
+  retries: 6
+
+
+   

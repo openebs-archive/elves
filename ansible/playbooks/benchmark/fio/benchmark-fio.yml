@@ -1,0 +1,65 @@
+- name: Get $HOME of K8s minion for kubernetes user
+  shell: source ~/.profile; echo $HOME
+  args:
+    executable: /bin/bash
+  register: result_kube_home
+  delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
+- name: Create a temp dir to hold fio config files
+  file:
+    path: fio_templates
+    state: directory
+
+- name: Get list of workload profile files
+  shell: ls {{playbook_dir}}/templates/{{workload_template}}
+  register: workload_profiles
+
+- name: Create fio config files from the input YAML
+  command: >
+    python {{playbook_dir}}/fio/fio-confgen.py
+    {{playbook_dir}}/templates/{{workload_template}}/{{item}}
+    {{playbook_dir}}/fio_templates
+  with_items: "{{ workload_profiles.stdout_lines }}"
+
+- name: Copy the folder to the minion
+  command: >
+    rsync -r --remove-source-files fio_templates
+    {{minion_user}}@{{minion_host}}:{{ result_kube_home.stdout }}
+
+- name: Remove the local fio temp dir 
+  file:
+    path: fio_templates
+    state: absent
+
+- name: Copy fio-specific files to minion
+  copy:
+    src: "{{playbook_dir}}/fio/{{item}}"
+    dest: "{{ result_kube_home.stdout }}"
+  with_items: "{{fio_files}}"
+  delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
+- name: Build fio test container
+  docker_image:
+    name: "{{ fio_image }}"
+    state: present
+    path: "{{ result_kube_home.stdout }}"
+    rm: true
+    timeout: 600
+  become: true
+  delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
+- name: Run the fio test
+  docker_container:
+    name: "{{ fio_image }}"
+    image: "{{ fio_image }}"
+    volumes:
+      - '{{ result_kube_home.stdout }}/fio_templates:/templates'
+      - '{{data_dir}}:/datadir'
+      - '{{log_dir}}:/logdir'
+    network_mode: host
+    command: sh fio-runner.sh templates logdir
+    state: started
+  become: true
+  delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
+

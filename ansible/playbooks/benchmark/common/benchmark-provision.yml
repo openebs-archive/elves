@@ -1,0 +1,108 @@
+- name: Get $HOME of K8s master for kubernetes user
+  shell: source ~/.profile; echo $HOME
+  args:
+    executable: /bin/bash
+  register: result_kube_home
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Copy the volume claim to kube master
+  copy:
+    src: "{{ playbook_dir }}/common/{{ volume_def }}"
+    dest: "{{ result_kube_home.stdout }}"
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+- name: Create a storage volume via a pvc
+  shell: source ~/.profile; kubectl apply -f "{{ volume_def }}"
+  args:
+    executable: /bin/bash
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+- name: Confirm volume container is running
+  shell: source ~/.profile; kubectl get pods | grep pvc
+  args:
+    executable: /bin/bash
+  register: result
+  until: "'ctrl' and 'Running' in result.stdout_lines[0] and 'rep' and 'Running' in result.stdout_lines[1]"
+  delay: 30
+  retries: 6
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+- name: Get storage ctrl pod name
+  shell: source ~/.profile; kubectl get pods | grep ctrl
+  args:
+    executable: /bin/bash
+  register: ctrl_name
+  delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+- name: Set ctrl pod name to variable
+  set_fact:
+    ctrl_pod_name: "{{ ctrl_name.stdout.split()[0] }}"
+
+- name: Get IP address of ctrl pod
+  shell: source ~/.profile; kubectl describe pod {{ ctrl_pod_name }} | grep IP
+  args:
+    executable: /bin/bash
+  register: ctrl_IP
+  delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+- name: Set IP of Pod to variable
+  set_fact:
+    ctrl_ip: "{{ ctrl_IP.stdout_lines[0].split()[1]}}"
+
+- name: Identify actual portal address from ctrl pod IP
+  shell: iscsiadm -m discovery -t st -p {{ctrl_ip}}:3260
+  args:
+    executable: /bin/bash
+  register: result
+  become: true
+  delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
+- name: Set portal IP to variable
+  set_fact:
+    portal_ip: "{{ result.stdout_lines[0].split(':')[0] }}"
+
+- name: Discover & login to iSCSI target on the minion
+  open_iscsi:
+    show_nodes: yes
+    portal: "{{portal_ip}}"
+    discover: yes
+    login: yes
+  register: result
+  until: "'iqn' in result.nodes[0]"
+  retries: 6
+  delay: 10
+  become: true
+  delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
+- name: Set target IQN to variable
+  set_fact: 
+    target_iqn: "{{result.nodes[0]}}"
+
+- name: Create file system on the iSCSI storage
+  filesystem:
+    fstype: ext4
+    dev: "{{result.devicenodes[0]}}"
+    force: no
+  become: true
+  delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
+- name: Create test directories on minion
+  file:
+    path: "{{item}}"
+    state: directory
+  with_items:
+    - "{{data_dir}}"
+    - "{{log_dir}}"
+  become: true
+  delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
+- name: Mount Device by Label
+  mount:
+    name: "{{data_dir}}"
+    src: "{{result.devicenodes[0]}}"
+    fstype: ext4
+    opts: discard,_netdev
+    state: mounted
+  become: true
+  delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
