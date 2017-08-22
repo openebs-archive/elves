@@ -57,10 +57,10 @@ supporting directories/files are placed at `benchmark/fio` and `benchmark/vdbenc
 
 A master playbook `benchmark/benchmark.yml` triggers the benchmark tests 
 
-- by first installing the pre-requisites on the storage hosts (`benchmark/benchmark-prerequisites.yml`) 
-- followed by provisioning the storage volume (`benchmark/common/benchmark-provision.yml`) 
-- running the test containers (`benchmark/fio/benchmark-fio.yml` or `benchmark/vdbench/benchmark-vdbench.yml`) and 
-- finally cleaning up the environment (`benchmark/benchmark-cleanup.yml`) 
+- by first installing the pre-requisites on the storage hosts (`benchmark-prerequisites.yml`) 
+- followed by provisioning the storage volume (`common/benchmark-provision.yml`) 
+- generating tool-specific config files and running the test containers (`fio/benchmark-fio.yml` or `vdbench/benchmark-vdbench.yml`)  
+- finally cleaning up the environment (`benchmark-cleanup.yml`) 
 
 
 
