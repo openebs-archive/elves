@@ -9,7 +9,7 @@ Vagrant.require_version ">= 1.6.0"
 NODES = ENV['NODES'] || 1
 
 # Memory & CPUs
-MEM = ENV['MEM'] || 1024
+MEM = ENV['MEM'] || 2048
 CPUS = ENV['CPUS'] || 1
 
 # Common installation stuff
@@ -20,7 +20,7 @@ echo Will run the common installer script ...
 
 # Update apt and get dependencies
 sudo apt-get update
-sudo apt-get install -y zip unzip curl wget
+sudo apt-get install -y zip unzip curl wget graphviz
 
 SCRIPT
 
@@ -37,10 +37,6 @@ bash buildscripts/install_go.sh
 # A bit of conditional logic s.t. we do not repeat cd-ing
 grep "cd /opt/gopath/src/github.com/openebs/elves/e2e" /home/vagrant/.profile || \
   echo "cd /opt/gopath/src/github.com/openebs/elves/e2e" >> /home/vagrant/.profile
-
-# Install go dependencies i.e. vendoring
-echo "Run below command to get started with development:"
-echo "make init"
 SCRIPT
 
 required_plugins = %w(vagrant-cachier vagrant-vbguest)
@@ -82,6 +78,9 @@ def configureVM(vmCfg, hostname, cpus, mem)
   # Script will make some directories before installation procedure
   vmCfg.vm.provision "shell", inline: $installer, privileged: false 
   vmCfg.vm.provision "shell", inline: $e2edev, privileged: false
+  
+  # Install docker
+  vmCfg.vm.provision "docker"
   
   return vmCfg
 end

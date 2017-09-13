@@ -1,0 +1,17 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: tt-jctrl-resch
+  namespace: default
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: tt-jctrl-resch
+    spec:
+      serviceAccountName: openebs-maya-operator
+      containers:
+      - name: tt-jctrl-resch
+        imagePullPolicy: Always
+        image: openebs/m-e2e-tt-jctrl-resch:ci
