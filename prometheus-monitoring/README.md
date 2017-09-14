@@ -1,6 +1,6 @@
 ## prometheus-monitoring
 
-This contains very basic server program and it's endpoint monitoring with prometheus. Currently this setup only works on minikube.
+This contains very basic server program and it's endpoint monitoring with prometheus. Currently this setup only works on minikube.This repo is highly motivated from [this repo](https://github.com/marselester/prometheus-on-kubernetes). Future work of this repo to run it successfully on kubernetes and monitor maya-apiserver endpoints and volume stats with prometheus.
 
 # Steps
 * cd to this folder
