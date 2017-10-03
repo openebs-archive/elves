@@ -30,9 +30,7 @@ Make use of the Vagrantfile available at ../e2e
   vagrant ssh
   cd tt-jctrl-resch
 
-  make init
   make
-  make image
   ```
 
 ## World of Kubernetes
@@ -51,7 +49,7 @@ e.g. https://hub.docker.com/r/openebs/m-e2e-tt-jctrl-resch/tags/
 
 #### Run
 
-- Run the image in a Pod with a single instance Deployment:
+- Run this e2e image as a Kubernetes Job
 
   ```
   $ kubectl create -f deployment.yaml
@@ -59,16 +57,17 @@ e.g. https://hub.docker.com/r/openebs/m-e2e-tt-jctrl-resch/tags/
 
 ### Clean up
 
-- To stop this test and clean up the pod
+- To delete this job
   
   ```
-  $ kubectl delete deployment tt-jctrl-resch
+  $ kubectl delete job e2e-tt-jctrl-resch
   ```
 
-#### Deep Insight(s)
+- Check if any orphaned Pod(s) exist
 
-> `rest.InClusterConfig()` uses the `Service Account token` mounted inside the 
-Pod at `/var/run/secrets/kubernetes.io/serviceaccount` path.
+  ```
+  $ kubectl get pod -a
+  ```
 
 #### Appendix
 
