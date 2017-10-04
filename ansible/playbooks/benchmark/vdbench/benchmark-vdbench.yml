@@ -1,0 +1,71 @@
+- name: Get $HOME of K8s minion for kubernetes user
+  shell: source ~/.profile; echo $HOME
+  args:
+    executable: /bin/bash
+  register: result_kube_home
+  delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
+- name: Create a temp dir to hold vdbench config files
+  file:
+    path: vdbench_templates
+    state: directory
+
+- name: Get list of workload profile files
+  shell: ls {{playbook_dir}}/templates/{{workload_template}}
+  register: workload_profiles
+
+- name: Create vdbench config files from the input YAML
+  command: >
+    python {{playbook_dir}}/vdbench/vdbench-confgen.py
+    {{playbook_dir}}/templates/{{workload_template}}/{{item}}
+    {{playbook_dir}}/vdbench_templates
+  with_items: "{{ workload_profiles.stdout_lines }}"
+
+- name: Copy the folder to the minion
+  command: >
+    rsync -r --remove-source-files vdbench_templates
+    {{minion_user}}@{{minion_host}}:{{ result_kube_home.stdout }}
+
+- name: Remove the local vdbench temp dir 
+  file:
+    path: vdbench_templates
+    state: absent
+
+- name: Copy vdbench-specific files to minion
+  copy:
+    src: "{{playbook_dir}}/vdbench/{{item}}"
+    dest: "{{ result_kube_home.stdout }}"
+    mode: 0777
+  with_items: "{{vdbench_files}}"
+  delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
+- name: Copy the vdb folder to minion
+  command: >
+    rsync -r {{playbook_dir}}/vdbench/vdb
+    {{minion_user}}@{{minion_host}}:{{ result_kube_home.stdout }} 
+
+- name: Build vdbench test container
+  docker_image:
+    name: "{{ vdbench_image }}"
+    state: present
+    path: "{{ result_kube_home.stdout }}"
+    rm: true
+    timeout: 600
+  become: true
+  delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
+- name: Run the vdbench test
+  docker_container:
+    name: "{{ vdbench_image }}"
+    image: "{{ vdbench_image }}"
+    volumes:
+      - '{{ result_kube_home.stdout }}/vdbench_templates:/templates'
+      - '{{data_dir}}:/datadir'
+      - '{{log_dir}}:/logdir'
+    network_mode: host
+    command: sh -x vdbench-runner.sh templates logdir
+    state: started
+  become: true
+  delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
+

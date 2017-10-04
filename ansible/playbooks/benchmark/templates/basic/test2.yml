@@ -1,0 +1,73 @@
+################################################################
+# This YAML takes a set of input parameters that characterize
+# the benchmark run. It consists of a custom-workload definition 
+# that is converted into a tool-specific config file, which is 
+# then run to simulate application workloads
+# 
+# The params are defined under two sections, Basic and Advanced. 
+# While the basic section deals with the most common/apparent 
+# params that change between real-world applications, the advanced 
+# sections contains  params that are tuned to simulate specific 
+# system conditions
+# 
+# Please refer the README for more details on the params
+###############################################################
+
+####################
+# BASIC PARAMETERS #
+####################
+
+# Name of the fio test
+NAME: General
+
+# I/O transfer size (in Bytes)
+IO_SIZE: 4096
+
+# Read percentage (%)
+RW_RATIO: 50
+
+# No of files created/accessed
+NUM_FILES: 16 
+
+# Size of file (in MB)
+FILE_SIZE: 10 
+
+# I/O randomness 
+ACCESS_PATTERN: Random 
+
+# No of Concurrent I/O processes  
+NUM_WORKERS: 16
+
+# No of queued I/Os
+QUEUE_DEPTH: 2
+
+# Precondition/Ramp-up duration (in sec)
+WARMUP: 10
+
+# Duration of I/O test (in sec)
+DURATION: 60
+
+#######################
+# ADVANCED PARAMETERS #
+#######################
+
+# Application I/O arrival rate
+BURST_IO: False 
+
+# Random I/O offset alignment (In Bytes)
+IO_ALIGNMENT: 4096
+
+# Usage of host filesystem cache
+BUFFERED_IO: False 
+
+# Type of I/O issued by host
+DATA_TRANSFER: async 
+
+# Data deduplication percentage 
+DEDUPE_PERCENTAGE: 30
+
+# Data compression percentage
+COMPRESS_PERCENTAGE: 20
+
+
+

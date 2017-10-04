@@ -1,0 +1,38 @@
+---
+- hosts: localhost
+
+  vars_files:
+    - benchmark-vars.yml
+
+  tasks: 
+   - block:
+
+       - include: benchmark-prerequisites.yml
+       
+       - include: common/benchmark-provision.yml
+
+       - block:
+           - include: fio/benchmark-fio.yml
+         when: benchmark_tool == 'fio'
+
+       - block:
+           - include: vdbench/benchmark-vdbench.yml
+         when: benchmark_tool == 'vdbench'
+
+       - include: benchmark-cleanup.yml
+
+       - set_fact:
+           flag: "Pass"
+           flag_msg: "Ran benchmark suite successfully"
+
+     rescue: 
+       - set_fact: 
+           flag_msg: "Failed to run benchmark test suite"
+            
+     always:
+       - block:
+           - name: Send test status slack notification
+             slack:
+               token: "{{ lookup('env','SLACK_TOKEN') }}"
+               msg: '{{ ansible_date_time.time }} {{ flag_msg }}'   
+         when: slack_notify | bool and lookup('env','SLACK_TOKEN')
