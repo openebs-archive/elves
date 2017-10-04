@@ -1,0 +1,16 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: server-deployment
+spec:
+  replicas: 2 
+  template:
+    metadata:
+      labels:
+        app: goserver
+    spec:
+      containers:
+        - name: goserver
+          image: utkarshmani1997/goserver:v1.5
+          ports:
+            - containerPort: 8080
