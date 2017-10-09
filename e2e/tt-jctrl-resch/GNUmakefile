@@ -6,7 +6,7 @@ VETARGS?=-asmdecl -atomic -bool -buildtags -copylocks -methods \
 PACKAGES = $(shell go list ./... | grep -v '/vendor/')
 
 .PHONY: all
-all: format lint deps test image
+all: format lint test image
 
 .PHONY: init
 init: clean setup
@@ -26,7 +26,6 @@ clean:
 	@echo "--> Running clean"
 	@echo "------------------"
 	@rm -rf ./app
-	@rm -rf vendor/*/
 
 .PHONY: format
 format:
@@ -57,7 +56,6 @@ deps:
 	@echo "-------------------------"
 	@dep status
 
-# This is the main command of this project.
 .PHONY: test
 test:
 	@echo "------------------"
