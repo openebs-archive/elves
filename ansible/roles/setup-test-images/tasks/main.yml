@@ -1,0 +1,68 @@
+---
+- name: Install APT Packages
+  apt:
+    name: "{{item}}"
+    state: present
+  with_items: "{{deb_local_packages}}"
+  become: true
+  delegate_to: 127.0.0.1
+
+- name: Install PIP Packages
+  pip:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ pip_local_packages }}"
+  delegate_to: 127.0.0.1
+  become: true
+
+- name: Fetch test images from dockerhub
+  docker_image: 
+    name: "{{item}}"
+    state: present
+    pull: true
+    force: yes
+  register: result
+  until: "'Pulled image' and item in result.actions[0]"
+  delay: 60
+  retries: 3  
+  with_items: "{{ test_images }}"
+  become: true
+
+- name: Print test image names
+  shell: printf "{{ item }}\n" >> imagelist.tmp
+  with_items: "{{ test_images }}"
+
+- name: Create files directory in load-test-images role
+  file:
+    path: "{{ playbook_dir }}/roles/load-test-images/files"
+    state: directory
+    mode: 0755
+
+- name: TAR the test images 
+  shell: docker save $(cat imagelist.tmp) -o {{playbook_dir}}/roles/load-test-images/files/{{ tarfile }}
+  become: true
+
+- name: Remove the .tmp file created to hold image list
+  file: path="{{playbook_dir}}/imagelist.tmp" state=absent
+
+- name: Get current user details
+  command: whoami
+  register: user
+
+- name: Change permissions of tarfile 
+  file:
+    path: "{{playbook_dir}}/roles/load-test-images/files"
+    owner: "{{ user.stdout }}"
+    group: "{{ user.stdout }}"
+    recurse: true
+  become: true 
+
+- name: Remove test images from localhost
+  docker_image:
+    name: "{{ item }}" 
+    state: absent
+  with_items: "{{ test_images }}"
+  become: true
+  
+
+
