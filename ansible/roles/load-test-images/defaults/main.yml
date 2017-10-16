@@ -1,0 +1,6 @@
+---
+
+tarfile: test_images.tar
+
+# Applies to non-vagrant VMs/baremetal
+tarfile_path: "{{ ansible_env.HOME}}"

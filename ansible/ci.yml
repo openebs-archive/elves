@@ -1,26 +1,17 @@
 ---
-- hosts: localhost
+- include: pre-requisites.yml
 
-  roles:
-    - inventory
-      
-- hosts: openebs-mayamaster
+- include: setup-kubernetes.yml
 
-  roles:
-    - master
-    - {role: vagrant, when: is_vagrant_vm | bool} 
+- include: setup-openebs.yml
 
-- hosts: openebs-mayahosts
+- include: load-images.yml
 
-  roles:
-    - hosts
-    - {role: vagrant, when: is_vagrant_vm | bool}
+- include: run-dedicated-tests.yml
+  when: deployment_mode == "dedicated"
 
-- hosts: localhost  
+- include: run-hyperconverged-tests.yml
+  when: deployment_mode == "hyperconverged"
 
-  roles:
-    - {role: localhost, when: run_demo | bool} 
-    - {role: volume, when: run_demo | bool}
-    - {role: fio, when: run_demo | bool}
-    - {role: cleanup, when: run_demo | bool}
+ 
 

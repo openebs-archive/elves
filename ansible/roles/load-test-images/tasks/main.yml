@@ -1,0 +1,28 @@
+---
+- block:
+
+    - name: Load test images from Archive
+      command: docker load --input "{{ tarfile }}"
+      args:
+        chdir: "/vagrant/roles/load-test-images/files"
+      become: true
+
+  when: is_vagrant_vm
+
+- block:
+
+    - name: Copy test image tarfile to kubernetes hosts
+      copy:
+        src: "{{ tarfile }}"
+        dest: "{{ tarfile_path }}"
+      become: true
+      when: is_vagrant_vm
+
+    - name: Load test images from Archive
+      command: docker load --input "{{ tarfile }}"
+      args:
+        chdir: "{{ tarfile_path }}"
+      become: true
+
+  when: not is_vagrant_vm
+
