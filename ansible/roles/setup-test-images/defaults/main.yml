@@ -6,23 +6,8 @@ pip_local_packages:
   - 'docker-py==1.9.0'
 
 test_images:
-
-  # I/O-tool-specific images
-  
-  #- openebs/tests-fio
-  #- openebs/tests-vdbench
-  
-  # App-specific images
-  
-  - percona
-  - satyamz/docker-jupyter:v0.4
-  - crunchydata/crunchy-postgres:centos7-9.6-1.4.0
-  #- openebs/tests-mysql-master
-  #- openebs/tests-mysql-slave
-  
-  # App-load-generator images
-  
-  - openebs/tests-mysql-client 
-  #- openebs/tests-tpcc-client
-
-tarfile: test_images.tar
+# keys -> label:image:tag
+  - {label: percona, image: percona, tag: latest}
+  - {label: jupyter, image: satyamz/docker-jupyter, tag: v0.4}
+  - {label: postgres, image: crunchydata/crunchy-postgres, tag: centos7-9.6-1.4.0}
+  - {label: mysqlclient, image: openebs/tests-mysql-client, tag: latest}
