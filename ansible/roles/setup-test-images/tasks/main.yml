@@ -17,20 +17,16 @@
 
 - name: Fetch test images from dockerhub
   docker_image: 
-    name: "{{item}}"
+    name: "{{item.image}}:{{item.tag}}"
     state: present
     pull: true
     force: yes
   register: result
-  until: "'Pulled image' and item in result.actions[0]"
+  until: "'Pulled image' and item.image in result.actions[0]"
   delay: 60
   retries: 3  
   with_items: "{{ test_images }}"
   become: true
-
-- name: Print test image names
-  shell: printf "{{ item }}\n" >> imagelist.tmp
-  with_items: "{{ test_images }}"
 
 - name: Create files directory in load-test-images role
   file:
@@ -38,12 +34,15 @@
     state: directory
     mode: 0755
 
-- name: TAR the test images 
-  shell: docker save $(cat imagelist.tmp) -o {{playbook_dir}}/roles/load-test-images/files/{{ tarfile }}
+- name: Create TAR files for test images
+  shell: >
+    docker save {{item.image}}:{{item.tag}}
+    -o {{item.label}}_{{item.tag}}.tar
+  args:
+    chdir: "{{playbook_dir}}/roles/load-test-images/files"
+    creates: "{{item.label}}_{{item.tag}}.tar"
   become: true
-
-- name: Remove the .tmp file created to hold image list
-  file: path="{{playbook_dir}}/imagelist.tmp" state=absent
+  with_items: "{{ test_images }}"
 
 - name: Get current user details
   command: whoami
@@ -59,7 +58,7 @@
 
 - name: Remove test images from localhost
   docker_image:
-    name: "{{ item }}" 
+    name: "{{item.image}}:{{item.tag}}" 
     state: absent
   with_items: "{{ test_images }}"
   become: true

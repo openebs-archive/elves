@@ -87,10 +87,6 @@ slack_notify: true
 
 clean: true
 
-#Name of tarfile containing test images
-
-tarfile: test_images.tar
-
 #########################################
 # OpenEBS CI Specifications             #
 #########################################
