@@ -6,7 +6,7 @@ VETARGS?=-asmdecl -atomic -bool -buildtags -copylocks -methods \
 PACKAGES = $(shell go list ./... | grep -v '/vendor/')
 
 .PHONY: all
-all: format lint test image
+all: format lint test
 
 .PHONY: init
 init: clean setup
@@ -61,10 +61,10 @@ test:
 	@echo "------------------"
 	@echo "--> Running tests"
 	@echo "------------------"
-	@go test
+	@go test $(PACKAGES)
 
-.PHONY: image
-image:
-	@rm -rf ./app
-	@GOOS=linux go build -o ./app .
-	@sudo docker build -t openebs/m-e2e-tt-jctrl-resch:ci .
+.PHONY: tt-jctrl-resch-image
+tt-jctrl-resch-image:
+	@rm -rf ./tt-jctrl-resch/app
+	@GOOS=linux go build -o ./tt-jctrl-resch/app ./tt-jctrl-resch
+	@sudo docker build -t openebs/m-e2e-tt-jctrl-resch:ci ./tt-jctrl-resch

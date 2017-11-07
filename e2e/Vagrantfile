@@ -9,8 +9,8 @@ Vagrant.require_version ">= 1.6.0"
 NODES = ENV['NODES'] || 1
 
 # Memory & CPUs
-MEM = ENV['MEM'] || 2048
-CPUS = ENV['CPUS'] || 1
+MEM = ENV['MEM'] || 4096
+CPUS = ENV['CPUS'] || 2
 
 # Common installation stuff
 $installer = <<SCRIPT
