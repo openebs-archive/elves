@@ -1,2 +1,3 @@
 sup/.vagrant/*
 e2e/.vagrant/*
+e2e/*/app
