@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: e2e-demo-replica-count
+  namespace: default
+spec:
+  template:
+    metadata:
+      labels:
+        name: e2e-demo-replica-count
+    spec:
+      #serviceAccountName: openebs-maya-operator
+      containers:
+      - name: e2e-demo-replica-count
+        imagePullPolicy: Always
+        image: openebs/m-e2e-demo-replica-count:ci
+      restartPolicy: Never

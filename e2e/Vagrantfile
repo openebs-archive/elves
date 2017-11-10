@@ -12,7 +12,7 @@ NODES = ENV['NODES'] || 1
 MEM = ENV['MEM'] || 4096
 CPUS = ENV['CPUS'] || 2
 
-# Common installation stuff
+# Common installation script
 $installer = <<SCRIPT
 #!/bin/bash
 
@@ -20,24 +20,134 @@ echo Will run the common installer script ...
 
 # Update apt and get dependencies
 sudo apt-get update
-sudo apt-get install -y zip unzip curl wget graphviz
+sudo apt-get install -y zip unzip curl wget
 
 SCRIPT
 
-# Setting up the e2e devlopment & compilation related stuff
-$e2edev = <<SCRIPT
-#!/bin/sh
+$e2escript = <<SCRIPT
+#!/bin/bash
 
 cd /opt/gopath/src/github.com/openebs/elves/e2e
 
-# Install go development & compilation
+# Install go for development & compilation
 bash buildscripts/install_go.sh
 
 # cd into the e2e working directory when we login to the VM
 # A bit of conditional logic s.t. we do not repeat cd-ing
 grep "cd /opt/gopath/src/github.com/openebs/elves/e2e" /home/vagrant/.profile || \
   echo "cd /opt/gopath/src/github.com/openebs/elves/e2e" >> /home/vagrant/.profile
+
+echo ""
+echo "================================================"
+echo "Congrats!! E2E has been setup for development   "
+echo "================================================"
+echo ""
+
 SCRIPT
+
+$minikubescript = <<SCRIPT
+#!/bin/bash
+
+#Install minikube
+curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+chmod +x minikube 
+sudo mv minikube /usr/local/bin/
+
+#Install kubectl
+curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+chmod +x kubectl 
+sudo mv kubectl /usr/local/bin/
+
+#Setup minikube
+mkdir -p $HOME/.minikube
+mkdir -p $HOME/.kube
+touch $HOME/.kube/config
+
+# Push these ENV k:v to /home/vagrant/.profile to 
+# start/restart minikube. This vagrant VM might have been created
+# earlier with minikube stopped for some reason.
+grep "MINIKUBE_WANTUPDATENOTIFICATION=false" /home/vagrant/.profile || \
+  echo "MINIKUBE_WANTUPDATENOTIFICATION=false" >> /home/vagrant/.profile
+
+grep "MINIKUBE_WANTREPORTERRORPROMPT=false" /home/vagrant/.profile || \
+  echo "MINIKUBE_WANTREPORTERRORPROMPT=false" >> /home/vagrant/.profile
+
+grep "MINIKUBE_HOME=$HOME" /home/vagrant/.profile || \
+  echo "MINIKUBE_HOME=$HOME" >> /home/vagrant/.profile
+
+grep "CHANGE_MINIKUBE_NONE_USER=true" /home/vagrant/.profile || \
+  echo "CHANGE_MINIKUBE_NONE_USER=true" >> /home/vagrant/.profile
+
+grep "KUBECONFIG=$HOME/.kube/config" /home/vagrant/.profile || \
+  echo "KUBECONFIG=$HOME/.kube/config" >> /home/vagrant/.profile
+
+# Export above as well for `minikube start` to work 
+# in the same session of `vagrant up`
+export MINIKUBE_WANTUPDATENOTIFICATION=false
+export MINIKUBE_WANTREPORTERRORPROMPT=false
+export MINIKUBE_HOME=$HOME
+export CHANGE_MINIKUBE_NONE_USER=true
+export KUBECONFIG=$HOME/.kube/config
+
+# Permissions
+sudo chown -R $USER $HOME/.kube
+sudo chgrp -R $USER $HOME/.kube
+
+sudo chown -R $USER $HOME/.minikube
+sudo chgrp -R $USER $HOME/.minikube
+
+# Start minikube on this host itself
+sudo -E minikube start --vm-driver=none
+
+# This loop waits until kubectl can access the api server 
+# that Minikube has created
+for i in {1..20}; do # timeout for 20x3=60 seconds/1 minutes
+  kubectl get po &> /dev/null
+  if [ $? -ne 1 ]; then
+      echo ""
+      echo "============================================"
+      echo "Congrats!! minikube's apiserver is running"
+      echo "============================================"
+      echo ""
+      exit 0
+  fi
+  sleep 3
+done
+
+# Re-try minikube start
+now=$(date +%Y%m%d-%H%M%S)
+kubectl get po > /tmp/mk-$now 2>&1
+
+grep "The connection to the server 127.0.0.1:8443 was refused - did you specify the right host or port?" /tmp/mk-$now && sudo -E minikube start --vm-driver=none
+
+# loop for the final time
+for i in {1..10}; do # timeout for 10x5=50 seconds/ < 1 minute
+  kubectl get po &> /dev/null
+  if [ $? -ne 1 ]; then
+      echo ""
+      echo "============================================"
+      echo "Congrats!! minikube's apiserver is running"
+      echo "============================================"
+      echo ""
+      exit 0
+  fi
+  sleep 5
+done
+
+# If still not running
+kubectl get po &> /dev/null
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "================================================="
+    echo "Check Status  :: minikube status"
+    echo "Start minikube if it's in stopped state"
+    echo "Start Command :: sudo -E minikube start --vm-driver=none"
+    echo "================================================="
+    echo ""
+fi
+
+SCRIPT
+
 
 required_plugins = %w(vagrant-cachier vagrant-vbguest)
 
@@ -72,16 +182,17 @@ def configureVM(vmCfg, hostname, cpus, mem)
     vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
   end
   
+   # ensure docker is installed
+  vmCfg.vm.provision "docker"
+
   # sync your laptop's development with this Vagrant VM
   vmCfg.vm.synced_folder '.', '/opt/gopath/src/github.com/openebs/elves/e2e'
 
-  # Script will make some directories before installation procedure
+  # Script to prepare the VM
   vmCfg.vm.provision "shell", inline: $installer, privileged: false 
-  vmCfg.vm.provision "shell", inline: $e2edev, privileged: false
-  
-  # Install docker
-  vmCfg.vm.provision "docker"
-  
+  vmCfg.vm.provision "shell", inline: $e2escript, privileged: false
+  vmCfg.vm.provision "shell", inline: $minikubescript, privileged: false
+
   return vmCfg
 end
 

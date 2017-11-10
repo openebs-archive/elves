@@ -25,7 +25,8 @@ clean:
 	@echo "------------------"
 	@echo "--> Running clean"
 	@echo "------------------"
-	@rm -rf ./app
+	@rm -rf ./tt-jctrl-resch/app
+	@rm -rf ./demo-replica-count/app
 
 .PHONY: format
 format:
@@ -68,3 +69,9 @@ tt-jctrl-resch-image:
 	@rm -rf ./tt-jctrl-resch/app
 	@GOOS=linux go build -o ./tt-jctrl-resch/app ./tt-jctrl-resch
 	@sudo docker build -t openebs/m-e2e-tt-jctrl-resch:ci ./tt-jctrl-resch
+
+.PHONY: demo-replica-count-image
+demo-replica-count-image:
+	@rm -rf ./demo-replica-count/app
+	@GOOS=linux go build -o ./demo-replica-count/app ./demo-replica-count
+	@sudo docker build -t openebs/m-e2e-demo-replica-count:ci ./demo-replica-count
