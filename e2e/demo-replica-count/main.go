@@ -99,7 +99,7 @@ const (
 
 	// OpenEBSVolumeCtrlDC will display the details of OpenEBS volume controller(s)
 	OpenEBSVolumeCtrlDC DisplayCommand = `kubectl get deploy -l openebs/controller=jiva-controller`
-	
+
 	// PerconaPVCDC will display the details of percona pvc
 	PerconaPVCDC DisplayCommand = `kubectl get pvc demo-vol1-claim -o yaml`
 )
@@ -354,14 +354,9 @@ func execSh(s string) {
 //
 func prompt(msg string) {
 	fmt.Printf("[PROMPT] " + msg + " ?")
-	// This should be executed when DEMO mode is ON !!
-	//isDemo := CheckTruthy(getEnv(DemoModeEK))
-	//if !isDemo {
-	//	return
-	//}
 
-  var i int
-  fmt.Scanf("%d\n", &i)
+	var i int
+	fmt.Scanf("%d\n", &i)
 }
 
 // execShResult will run the command in sh & return its result
@@ -559,7 +554,7 @@ func main() {
 
 	// this E2E instance's LOGIC starts from here
 	// create percona storage class
-	create(PerconaStorageClassCC)	
+	create(PerconaStorageClassCC)
 	// verify percona storage class
 	if !verifyPresence(PerconaStorageClassVC) {
 		fmt.Printf("[ERR] Percona storage class could not be created\n")
@@ -567,10 +562,9 @@ func main() {
 	}
 	// display percona storage class
 	display("percona storage class details", PerconaStorageClassDC)
-	
-	
+
 	prompt("Create percona app")
-		
+
 	// create percona app
 	create(PerconaAppCC)
 	// display percona pvc
@@ -582,7 +576,7 @@ func main() {
 		fmt.Printf("[ERR] Percona app is not running\n")
 		return
 	}
-	
+
 	// display openebs volume controller deployments
 	display("openebs volume controller(s) details", OpenEBSVolumeCtrlDC)
 	// display openebs volume replica deployments
@@ -593,14 +587,6 @@ func main() {
 
 	// delete percona app
 	delete(PerconaAppDELC)
-
-	// delete percona persistent volume
-	//perconaPV, err := fetch(VolumeFromPVCFC)
-	//if err != nil {
-	//	fmt.Printf("[ERR] Could not fetch percona pv\n")
-	//	return
-	//}
-	//delete(DeleteCommand(fmt.Sprintf(PVDELC, perconaPV)))
 
 	// delete percona persistent volume claim
 	delete(PerconaPVCDELC)
