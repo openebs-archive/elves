@@ -240,7 +240,7 @@ spec:
       containers:
       - name: openebs-provisioner
         imagePullPolicy: Always
-        image: satyamz/provisioner:v0.5-rc
+        image: openebs/openebs-k8s-provisioner:latest
         env:
         - name: NODE_NAME
           valueFrom:
