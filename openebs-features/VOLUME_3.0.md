@@ -13,42 +13,57 @@ End Date:
 #### Motivation
 
 [A]
-We have Maya api server caterings to the needs of openebs volume provisioning.
-While it has sufficed most of the needs for provisioning, there is good scope
-for improvement when it comes to provisioning storage desired by an operator.
-There is no one size fits all for an application. The storage characteristics
-changes depending on the application that wants to consume the former. The 
-application along with its workload patterns & deployment environment 
-necessitates tunings to its underlying storage. This is required for the application
-to behave similarly even with the changes to load & deployment environment.
+We have maya api service catering to the needs of openebs volume provisioning.
+While it has sufficed most of the needs for provisioning, the current approach
+is no longer suitable & seems to be fragile, when it comes to provisioning a storage
+to the desires of an operator in an ever changing K8s environment from one 
+deployment to another. The rapidly changing K8s versions, new features & deprecations
+all add to the complexity to the current maya api service logic.
+
+[B]
+Persistent storage needs tuning based on the application that wants 
+to consume the former. The application along with its workload patterns & deployment environment necessitates tunings to its underlying storage. This is required for
+the application to adhere to its SLAs even with the changes to its load pattern &
+overall deployment environment.
 
 We at OpenEBS belive, these kind of requirements can be handled when thought in 
 terms of storage policies. A storage policy may be composed of various fine 
-granular storage policies.
-
-[B]
-Kubernetes has been coming up with new patterns for building controllers. Controllers
-are logic that is tied to Kubernetes APIs one one hand & application's operational
-logic on the other. It seems good to implement volume provisioning logic as a K8s
-controller & hence reap the benefits of K8s lifecycle, non-functional, etc.
-features by default. This also assumes, maya to deviate from its earlier philosophy
-of being an abstraction to various container orchestrators. In other words, maya
-will be tightly coupled with Kubernetes.
+granular storage policies. More about this can be understood from the proposed
+designs in the later sections.
 
 [C]
+Kubernetes has been coming up with new patterns for building controllers. Controllers
+are logic that is tied to Kubernetes APIs on one hand & application's operational
+requirement on the other. It seems good to implement volume provisioning logic as 
+a K8s controller & hence reap the benefits of K8s lifecycle, non-functional 
+requirements, etc. by default. This also assumes, maya to deviate from its earlier
+philosophy of being an abstraction to various container orchestrators. In other 
+words, in this new approach, maya will be tightly coupled with Kubernetes.
+
+[D]
 Maya api server needs to cater to various volume types i.e. jiva, cstor, etc
 with ease. Any new volume type should be implemented with ease. Maya api server
 should establish a pattern that can be easily followed to add or update any volume
-types.
+types. The new approach removes volume type based logic. Instead it boils down to
+configuring yamls that suit the volume type. Hence, Maya becomes a pure pass 
+through layer without bothering about volume types. Any volume that can run inside
+a container without maya can be run with maya as well. The benefits of running
+these volumes with maya are handling of orthogonal concerns related to persistent
+storage e.g. running them inside Kubernetes with its choice of storage policies.
 
-[D]
+[E]
 Declarative Code is the new norm. While declarative code has its own rough edges,
-we are seeing less of those cases in Kubernetes world. The reason behind this is
-the way declarative yamls are mapped with Go's structs. Kubernetes avoids the 
-templating stuff in these declarations and instead transforms to strict
-types for all its Kind. It has not failed in its attempt so far considering the
-popularity of these yamls among the developers as well as operators and testers.
+we are seeing less of symptoms in Kubernetes world. Most possible reason behind 
+this is the way declarative yamls are mapped with Go's structs. Kubernetes avoids
+/minimises the templating stuff in these declarations and instead transforms to 
+strict types for all its Kind. It has not failed in its attempt so far considering 
+the popularity of these yamls among the developers as well as operators and testers.
 Hence, it makes sense for maya to make use of these yamls as much as possible.
+Current approach of maya is to generate these yamls/structure by putting in good
+amount of logic/code. The new approach ensures that these yamls are outside this 
+logic and can be seen, updated by an operator or her preferred tool before being
+entrusted to maya. In short the new approach provides greater control to the 
+operator who is more used to these yamls.
 
 #### Design -- Volume API/Structure
 
@@ -114,8 +129,6 @@ const (
 
 #### Design -- StorageClass
 
-
-- NOTE: This is not mandated to be followed at customer deployments
 - StorageClass is the placeholder that refers to openebs storage policy & openebs
 storage property
 
