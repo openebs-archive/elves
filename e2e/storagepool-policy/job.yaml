@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: e2e-storagepool-policy
+  namespace: default
+spec:
+  template:
+    metadata:
+      labels:
+        name: e2e-storagepool-policy
+    spec:
+      containers:
+      - name: e2e-storagepool-policy
+        imagePullPolicy: Always
+        image: openebs/m-e2e-storagepool-policy:ci
+      restartPolicy: Never
