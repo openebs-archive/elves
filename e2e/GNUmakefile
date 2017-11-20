@@ -75,3 +75,9 @@ demo-replica-count-image:
 	@rm -rf ./demo-replica-count/app
 	@GOOS=linux go build -o ./demo-replica-count/app ./demo-replica-count
 	@sudo docker build -t openebs/m-e2e-demo-replica-count:ci ./demo-replica-count
+
+.PHONY: storagepool-policy
+storagepool-policy-image:
+	@rm -rf ./storagepool-policy/app
+	@GOOS=linux go build -o ./storagepool-policy/app ./storagepool-policy
+	@sudo docker build -t openebs/m-e2e-storagepool-policy:ci ./storagepool-policy
