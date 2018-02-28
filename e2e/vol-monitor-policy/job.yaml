@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: e2e-vol-monitor-policy
+  namespace: default
+spec:
+  template:
+    metadata:
+      labels:
+        name: e2e-vol-monitor-policy
+    spec:
+      containers:
+      - name: e2e-vol-monitor-policy
+        imagePullPolicy: Always
+        image: openebs/m-e2e-vol-monitor-policy:ci
+      restartPolicy: Never
