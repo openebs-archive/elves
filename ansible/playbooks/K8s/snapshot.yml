@@ -1,0 +1,327 @@
+---
+- hosts: localhost
+
+  vars_files: 
+    - snapshot-vars.yml
+
+  tasks:
+   - block:
+
+       - name: Get maya-apiserver pod name
+         shell: source ~/.profile; kubectl get pods --selector=name=maya-apiserver
+         args:
+           executable: /bin/bash
+         register: result_name
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Store maya-apiserver pod name in variable
+         set_fact:
+           maya_pod: "{{ result_name.stdout_lines[1].split()[0] }}"
+
+       - name: Get $HOME of K8s master for kubernetes user
+         shell: source ~/.profile; echo $HOME
+         args:
+           executable: /bin/bash
+         register: result_kube_home
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Copy the volume claim to kube master
+         copy:
+           src: "{{ volume_def }}"
+           dest: "{{ result_kube_home.stdout }}"
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+       - name: Start the log aggregator to capture test pod logs
+         shell: >
+           source ~/.profile;
+           nohup stern "{{test_pod_regex}}" --since 1m > "{{result_kube_home.stdout}}/{{test_log_path}}" &
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Create a storage volume via a pvc
+         shell: source ~/.profile; kubectl apply -f "{{ volume_def }}"
+         args:
+           executable: /bin/bash
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+       - name: Confirm volume container is running
+         shell: >
+           source ~/.profile; 
+           kubectl get pods | grep pvc | grep {{item}} | grep Running | wc -l
+         args:
+           executable: /bin/bash
+         register: result
+         until: result.stdout|int >= 1
+         delay: 30
+         retries: 10
+         with_items:
+           - ctrl
+           - rep
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"         
+
+       - name: Get storage ctrl pod name
+         shell: source ~/.profile; kubectl get pods | grep ctrl
+         args:
+           executable: /bin/bash
+         register: ctrl_name
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+       - name: Set ctrl pod name to variable
+         set_fact:
+           ctrl_pod_name: "{{ ctrl_name.stdout.split()[0] }}"  
+           vol_name: "{{ ctrl_name.stdout.split()[0].split('-ctrl-')[0] }}"
+         
+       - name: Get IP address of ctrl pod
+         shell: source ~/.profile; kubectl describe pod {{ ctrl_pod_name }} | grep IP
+         args:
+           executable: /bin/bash
+         register: ctrl_IP
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+ 
+       - name: Set IP of Pod to variable
+         set_fact:
+           ctrl_ip: "{{ ctrl_IP.stdout_lines[0].split()[1]}}" 
+
+       - name: Establish iSCSI session with volume
+         shell: iscsiadm -m discovery -t st -p {{ ctrl_ip }}:3260
+         become: true 
+         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+         register: result   
+       
+       - name: Store target iqn in variable 
+         set_fact:
+           iqn: "{{result.stdout.split(',')[1].split()[1]}}"
+  
+       - name: Login to iSCSI target
+         open_iscsi:
+           show_nodes: yes
+           login: yes
+           target: "{{iqn}}"
+         become: true 
+         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+         register: result
+
+       - name: Check device nodes
+         set_fact:
+           scsi_device: "{{result.devicenodes[0]}}"
+
+       - name: Create file system on iSCSI disk
+         filesystem:
+           fstype: ext4
+           dev: "{{scsi_device}}" 
+           force: no
+         become: true 
+         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
+       - name: Mount device by Label
+         mount:
+           name: "{{mount_point}}"
+           src: "{{scsi_device}}"
+           fstype: ext4
+           opts: discard,_netdev
+           state: mounted
+         become: true 
+         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
+       - name: Place test data into volume 
+         command: >
+           dd if=/dev/urandom of={{mount_point}}/f1
+           bs=1M count={{test_data_size | int * 1024}}
+         args:
+           creates: "{{mount_point}}/f1"
+         become: true 
+         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+    
+       - name: Get the checksum of file created
+         stat: 
+           path: "{{mount_point}}/f1"
+           checksum_algorithm: "{{checksum}}"
+         become: true
+         register: result
+         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
+       - name: Save checksum to variable 
+         set_fact: 
+           ckey: "{{result.stat.checksum}}"
+         failed_when: result.stat.checksum is not defined
+ 
+       - name: Unmount the volume 
+         mount: 
+           name: "{{mount_point}}"
+           state: unmounted
+         become: true
+         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
+       - name: Deploy the OpenEBS snapshot controller
+         shell: source ~/.profile; kubectl apply -f "{{ snap_controller_def }}"
+         args:
+           executable: /bin/bash
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+       
+       - name: Replace snap name in the snapshot YAML
+         lineinfile:
+           path: {{ snap_deploy_def }}
+           regexp: "name: snapshot-demo"
+           line: "name: {{ snap_name }}" #quicksnap
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}" 
+  
+       - name: Replace the PVC name in the snapshot YAML
+         lineinfile:
+           path: {{ snap_deploy_def }} 
+           regexp: "persistentVolumeClaimName: ebs-pvc"
+           line: "persistentVolumeClaimName: {{ pvc_name }}" #vut
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}" 
+
+       - name: Create volume snapshot 
+         shell: source ~/.profile; kubectl apply -f {{ snap_deploy_def }}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         register: result_snap
+         #failed_when: "'Created Snapshot is:' not in result_snap.stdout"
+
+       - name: Confirm successful snapshot creation
+         shell: >
+           source ~/.profile;
+           kubectl get volumesnapshot {{ snap_name }} -o yaml | grep type 
+         args:
+           executable: /bin/bash
+         register: snap_status
+         until: "snap_status.stdout == \"type: Ready\""
+         delay: 10
+         retries: 6
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Verify that the snapshot is listed by Maya
+         shell: >
+           source ~/.profile;
+           kubectl exec {{maya_pod}} -c maya-apiserver
+           -- maya snapshot list -volname {{pvc_name}}
+         args: 
+           executable: /bin/bash
+         register: result_snap_list
+	 delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+         failed_when: "snap_name not in result_snap_list.stdout"
+         
+       - name: Replace the snapshot name in the snap-pvc/clone YAML
+         lineinfile:
+           path: {{ clone_def }}
+           regexp: "snapshot.alpha.kubernetes.io/snapshot: snapshot-demo"
+           line: "snapshot.alpha.kubernetes.io/snapshot: {{ snap_name }}" #vut
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}" 
+
+       - name: Create a clone from the volume snapshot 
+         shell: source ~/.profile; kubectl apply -f {{ clone_def }}
+         args:
+           executable: /bin/bash
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         register: result_clone
+         
+       - name: Verify if the jiva replica sync for clone is successful 
+         shell: >
+           source ~/.profile; 
+           kubectl get << clone_name >> -o yaml | grep <<sync-status>>
+         args:
+           executable: /bin/bash
+         delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+         register: clone_sync_status
+         until: "clone_sync_status.stdout == <<sync-flag>>"
+         delay: 10
+         retries: 6
+
+       - name: Get IP address of clone ctrl pod
+         shell: source ~/.profile; kubectl describe pod << clone_ctrl_pod_name >> | grep IP
+         args:
+           executable: /bin/bash
+         register: clone_ctrl_IP
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Store clone target iqn in variable 
+         set_fact:
+           ciqn: "{{clone_ctrl_IP.stdout.split(',')[1].split()[1]}}"
+  
+       - name: Login to iSCSI target
+         open_iscsi:
+           show_nodes: yes
+           login: yes
+           target: "{{ciqn}}"
+         become: true 
+         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+         register: result
+
+       - name: Check device nodes
+         set_fact:
+           c_scsi_device: "{{result.devicenodes[0]}}"
+
+       - name: Remount the volume 
+         mount:
+           name: "{{mount_point}}"
+           src: "{{c_scsi_device}}"
+           fstype: ext4
+           opts: discard,_netdev
+           state: mounted
+         become: true
+         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
+    
+       - name: Check if file is present 
+         stat: 
+           path: "{{mount_point}}/f1"
+           checksum_algorithm: "{{checksum}}"
+         become: true
+         register: result
+         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+         failed_when: result.stat.exists is not defined and result.stat.exists != True
+
+       - name: Store checksum into variable
+         set_fact:
+           rkey: "{{result.stat.checksum}}"
+         failed_when: result.stat.checksum is not defined  
+       
+       - name: Compare the file checksum after revert
+         debug: 
+           msg: "Verified snapshot create and revert successfully"
+         failed_when: rkey != ckey
+  
+       - name: Unmount the storage volume as part of cleanup
+         mount:
+           name: "{{mount_point}}"
+           state: unmounted
+         become: true
+         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
+       - name: Tear down iSCSI sessions 
+         open_iscsi:
+           login: no
+           target: "{{ iqn }}"
+         become: true 
+         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"
+
+       - name: Remove stale node entries for ISCSI target
+         command: iscsiadm -m node -T {{iqn}} -o delete
+         become: true
+         delegate_to: "{{groups['kubernetes-kubeminions'].0}}"  
+
+       - include: snapshot-cleanup.yml
+
+       - name: Terminate the log aggregator
+         shell: source ~/.profile; killall stern
+         args:
+           executable: /bin/bash
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - set_fact: 
+           flag: "Pass"
+
+     rescue:  
+       - set_fact: 
+           flag: "Fail"
+ 
+     always: 
+       - name: Send slack notification
+         slack:
+           token: "{{ lookup('env','SLACK_TOKEN') }}"
+           msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
+         when: slack_notify | bool and lookup('env','SLACK_TOKEN') 
+

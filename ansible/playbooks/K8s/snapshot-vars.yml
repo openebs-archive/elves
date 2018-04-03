@@ -1,0 +1,25 @@
+---
+test_name: k8s_snap_create_revert 
+
+test_log_path: setup/logs/k8s_snap_create_revert.log
+
+test_pod_regex: maya*|openebs*|pvc*
+
+volume_def: test-pvc.yaml
+
+snap_controller_def: << openebs_snap_ctrl_def_yaml >>
+
+snap_deploy_def: << k8s_snap_resource_spec >>
+
+snap_promoter_sc_def: << sc_pointing_to_default_snap_provisioner >>
+
+clone_def: << clone_def_yaml >> #refers to the snap_promoter_sc & snap name
+
+mount_point: /mnt/jiva
+
+# In Gigabytes
+test_data_size: 1
+
+checksum: sha1
+
+snap_name: quicksnap
