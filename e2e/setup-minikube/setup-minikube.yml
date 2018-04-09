@@ -1,0 +1,104 @@
+- hosts: localhost
+
+  vars_files:
+    -  setup-minikube-vars.yml
+
+  tasks:
+
+  - block:
+
+    - name: Install required apt packages
+      shell: apt-get install {{ item }}
+      args:
+        executable: /bin/bash
+      become: true
+      with_items: "{{ apt_packages }}"
+      
+    - name: Check iscsid service status
+      shell: service iscsid status
+      args:
+        executable: /bin/bash
+      register: iscsi_status
+      become: true
+      until: "'active' and 'running' in iscsi_status.stdout"
+      delay: 30
+      retries: 5
+
+    - name: check docker service status
+      shell:  systemctl status docker
+      args: 
+        executable: /bin/bash
+      register: docker_status
+      become: true
+      until: "'active' and 'running' in docker_status.stdout"
+      delay: 30
+      retries: 5 
+     
+    - name: Start and Enable docker service
+      shell: systemctl enable docker; systemctl start docker
+      args:
+        executable:  /bin/bash
+      register: docker_enable
+      become: true
+        
+    - name: Download minikube packages
+      shell: curl {{ item }}
+      args:
+        executable:  /bin/bash
+      become: true
+      with_items: "{{ curl_packages }}"
+
+    - name: Change file permissions
+      shell: chmod +x minikube kubectl
+      become: true
+
+    - name: Move to the bin folder
+      shell:  mv minikube kubectl /usr/local/bin/
+      become: true
+    
+    - name: Setup the directory for storing Minikube and kubectl configuration.
+      shell: mkdir $HOME/.kube || true
+      become: true
+
+    - name: Create empty file(config) under directory.
+      shell: touch $HOME/.kube/config
+      become: true
+
+    - name: copy these configuration  line
+      shell: |
+        echo 'export MINIKUBE_WANTUPDATENOTIFICATION=false' >> ~/.profile,
+        echo 'export MINIKUBE_WANTREPORTERRORPROMPT=false' >> ~/.profile
+        echo 'export MINIKUBE_HOME=$HOME' >> ~/.profile
+        echo 'export CHANGE_MINIKUBE_NONE_USER=true' >> ~/.profile
+        echo 'export KUBECONFIG=$HOME/.kube/config' >> ~/.profile
+      become: true
+
+    - name: Start Minikube with option vm-driver=none
+      shell: minikube start --vm-driver=none
+      become: true
+
+    - name: After minikube configuration, we check minikube status
+      shell: minikube status
+      args:
+        executable: /bin/bash
+      register: minikube_status
+      become: true
+      until: "'minikube' and 'Running' in minikube_status.stdout"
+      delay: 30
+      retries: 10
+    
+    - set_fact:
+          flag: "Pass"
+
+    rescue:
+         - set_fact:
+              flag: "Fail"
+
+    always:
+        - name: Send slack notification
+          slack:
+           token: "{{ lookup('env','SLACK_TOKEN') }}"
+           msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}'
+          when: slack_notify | bool and lookup('env','SLACK_TOKEN')
+
+    
