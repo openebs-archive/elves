@@ -1,7 +1,0 @@
----
-
-volume_def: test-pvc.yaml
-
-py_file: test-mem.py
-
-mount_point: /mnt/jiva
