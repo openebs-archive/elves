@@ -4,7 +4,7 @@ test_name: setup-minikube
 
 apt_packages:
     - open-iscsi
-    - docker.io
+    
 
 curl_packages:
     - -Lo minikube https://storage.googleapis.com/minikube/releases/v0.24.1/minikube-linux-amd64
