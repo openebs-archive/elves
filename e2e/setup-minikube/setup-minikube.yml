@@ -22,12 +22,6 @@
       until: "'active' and 'running' in iscsi_status.stdout"
       delay: 30
       retries: 5
-   
-    - name: Install docker packages
-      apt: 
-        name: "{{item}}"
-      become: true
-      with_items: "{{apt_packages}}"
 
     - name: check docker service status
       shell:  systemctl status docker
@@ -46,7 +40,7 @@
       register: docker_enable
       become: true
         
-    - name: Download minikube packages
+    - name: Download and install required  curl packages
       shell: curl {{ item }}
       args:
         executable:  /bin/bash
