@@ -1,0 +1,5 @@
+
+the following command deletes any trailing whitespace at the end of each line
+(if using ansible-lint)
+
+:%s/\s\+$//e
