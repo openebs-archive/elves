@@ -1,0 +1,25 @@
+
+
+- hosts: localhost
+
+  vars_files:
+    - test-vars.yaml
+
+  tasks:
+
+    - shell: cat "{{ update_deploy_file }}"
+      args: 
+        executable: /bin/bash
+      register: result
+
+    - name : 6b) Update the deployment
+      shell: "kubectl -n kube-system patch deploy/tiller-deploy -p '{\"spec\": {\"template\": {\"spec\": {\"serviceAccountName\": \"tiller\"}}}}'"
+      #shell: kubectl -n kube-system patch deploy/tiller-deploy  "{{ result.stdout }}"
+      args:
+        executable: /bin/bash
+      register: tiller_deploy
+      delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+      until: "'deployment \"tiller-deploy\" patched' in tiller_deploy.stdout"
+      delay: 20
+      retries: 6
+
