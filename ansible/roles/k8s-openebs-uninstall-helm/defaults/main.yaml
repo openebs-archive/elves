@@ -1,0 +1,7 @@
+
+
+patch_file: update.json
+
+k8s_namespace: kube-system
+
+
