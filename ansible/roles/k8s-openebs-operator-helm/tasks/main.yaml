@@ -73,7 +73,7 @@
        args:
          executable: /bin/bash
        register: crb
-       until: "'clusterrolebinding \"tiller\" created' in crb.stdout"
+       until: "'\"tiller\" created' in crb.stdout"
        delay: 60
        retries: 5
 
