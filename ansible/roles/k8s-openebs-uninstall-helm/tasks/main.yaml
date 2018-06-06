@@ -30,7 +30,7 @@
   args: 
     executable: /bin/bash
   register: pod
-  until: "'openebs-apiserver' and 'openebs-provisioner' not in pod.stdout"
+  until: "'apiserver' and 'provisioner' not in pod.stdout"
   delay: 60
   retries: 15
 
@@ -91,4 +91,10 @@
   file:
     path: "{{ result_kube_home.stdout }}/{{ patch_file }}"
     state: absent
+
+- name: Deleting the storage classes
+  shell: kubectl delete -f "{{ storage_classes }}"
+  args:
+    executable: /bin/bash
+  
 
