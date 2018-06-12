@@ -1,0 +1,72 @@
+# The deployment for cstor-pool and cstor-pool-mgmt.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cstor-pool
+  labels:
+    app: cstor-pool
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cstor-pool
+  template:
+    metadata:
+      labels:
+        app: cstor-pool
+    spec:
+      containers:
+      - name: cstor-pool
+#The image name here will be changed to openebs once the business logic pr is reviewed and merged in openebs/maya.
+        image: gkganeshr/cstor-pool:v1.1
+        ports:
+        - containerPort: 80
+        securityContext: 
+          privileged: true
+
+        volumeMounts:
+        - name: device
+          mountPath: /dev     
+        - name: tmp
+          mountPath: /tmp
+#To avoid clash between terminating and restarting pod, we keep initial delay.
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/sh", "-c", "sleep 15"]
+
+      - name:    cstor-pool-mgmt
+#The image name here will be changed to openebs once the business logic pr is reviewed and merged in openebs/maya.
+        image: gkganeshr/cstor-pool-mgmt:v1.8
+        ports:
+        - containerPort: 80
+        securityContext: 
+          privileged: true
+        volumeMounts:
+        - name: device
+          mountPath: /dev
+        - name: tmp
+          mountPath: /tmp
+        env:
+          #cstorid env has UID of cStorPool CR
+        - name: cstorid
+          value: "f774f4dd-68a8-11e8-84c7-54e1ad4a9dd4"
+#To avoid clash between terminating and restarting pod, we keep initial delay.
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/sh", "-c", "sleep 15"]
+
+      volumes:
+      - name: device
+        hostPath:
+          # directory location on host
+          path: /dev
+          # this field is optional
+          type: Directory
+      - name: tmp
+        hostPath:
+#From host, dir called /var/openebs/shared-<uid> is created to avoid clash if two replicas run on same node.
+          path: /var/openebs/shared-a2b
+          type: Directory
