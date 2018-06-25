@@ -1,0 +1,18 @@
+---
+test_name: verify_replica_deployment_with_node_affinity
+
+percona_link: https://raw.githubusercontent.com/openebs/openebs/master/k8s/demo/percona/demo-percona-mysql-pvc.yaml
+
+utils_path: openebs/e2e/ansible/playbooks/utils
+
+test_log_path: setup/logs/nodeaffinity-cas-template.log
+
+test_pod_regex: maya*|openebs*|pvc*|percona*
+
+cas-template: https://raw.githubusercontent.com/openebs/openebs/master/k8s/openebs-volumepolicies.yaml
+
+test_artifacts:
+  -  openebs-volumepolicies.yaml
+  -  demo-percona-mysql-pvc.yaml
+
+namespace: nodeaffinty-castemplate
