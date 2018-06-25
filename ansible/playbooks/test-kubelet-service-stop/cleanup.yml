@@ -30,6 +30,10 @@
          retries: 10
          changed_when: true
 
+       - name: sleep for 10 seconds
+         wait_for:
+           timeout: "10"
+
        - name: Remove the percona liveness check config map
          shell: source ~/.profile; kubectl delete cm sqltest -n {{ namespace }}
          args:
