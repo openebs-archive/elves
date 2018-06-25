@@ -40,7 +40,7 @@ spec:
             exec: 
               command: ["bash", "sql-test.sh"]
             initialDelaySeconds: 30
-            periodSeconds: 10
+            periodSeconds: 1
             timeoutSeconds: 10
       volumes:
         - name: demo-vol1
