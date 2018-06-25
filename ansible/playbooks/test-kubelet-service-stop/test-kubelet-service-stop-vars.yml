@@ -1,5 +1,5 @@
 ---
-test_name: test_node_failure
+test_name: test_kubelet-service-restart
 
 percona_links:
   - https://raw.githubusercontent.com/openebs/elves/master/e2e/percona-liveness/percona.yaml 
@@ -14,13 +14,13 @@ replace_item:
   - demo-vol1
 
 replace_with:
-  - test-node-failure
-  - test-node
+  - test-kubelet-service
+  - test-kubelet
 
-namespace: node-failure 
+namespace: kubelet-service
 
 test_pod_regex: maya*|openebs*|pvc*|percona*
 
-test_log_path: setup/logs/node_failure_test.log
+test_log_path: setup/logs/kubelet_service_restart_test.log
 
 
