@@ -31,7 +31,7 @@
          include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/deploy_check.yml"
          vars:
            ns: openebs
-           app: maya-apiserver
+           app: apiserver
 
 
        - name: Copy the percona files to kube-master
@@ -48,6 +48,27 @@
            regex1: "{{replace_item}}"
            regex2: "{{replace_with}}"
          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+
+       - name: Get the number of nodes in the cluster
+         shell: kubectl get nodes | grep '<none>' | wc -l
+         args:
+           executable: /bin/bash
+         register: node_out
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+       - name: Fetch the node count from stdout
+         set_fact:
+            node_count: " {{ node_out.stdout}}"
+
+       - name: Get the number of nodes that are in ready state
+         shell: source ~/.profile; kubectl get nodes | grep 'Ready' | grep 'none' | wc -l
+         args:
+           executable: /bin/bash
+         register: ready_node_cout
+         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+       - debug:
+           msg: "All the nodes are in ready state"
+         when: (node_count)| int == (ready_node_cout.stdout)| int
 
 
        - name: Create namespace to deploy application
@@ -133,7 +154,7 @@
             ns: "{{ namespace }}"
             app: percona
 
-       - name: Check if the replica pods are created and running
+       - name: Check if the replica pods are scheduled again and running
          shell: source ~/.profile; kubectl get pods -n {{ namespace }} | grep rep | grep -i running |wc -l
          args:
            executable: /bin/bash
