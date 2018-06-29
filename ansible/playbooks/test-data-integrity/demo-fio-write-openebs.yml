@@ -1,0 +1,62 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: basic
+data:
+
+ File-BasicReadWrite: |-
+
+     [global]
+     directory=/datadir1
+     filesize=16m
+
+     [basic-fio]
+     rw=write
+     bs=4k
+     time_based=1
+     runtime=60
+     verify=crc32c
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: fio
+spec:
+  template:
+    metadata:
+      name: fio
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: perfrunner
+        image: openebs/tests-fio
+        command: ["/bin/bash"]
+        args: ["-c", "sleep 60;./fio_runner.sh Basic; exit 0"]
+        volumeMounts:
+           - mountPath: /datadir1
+             name: demo-vol1
+           - mountPath: templates/Basic/File-BasicReadWrite
+             subPath: File-BasicReadWrite
+             name: basic-configmap
+        tty: true
+
+      volumes:
+      - name: demo-vol1
+        persistentVolumeClaim:
+          claimName: demo-vol1-claim
+      - name: basic-configmap
+        configMap:
+          name: basic
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: demo-vol1-claim
+spec:
+  storageClassName: openebs-standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: "5G"
