@@ -172,18 +172,15 @@
          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
          changed_when: true
 
-       - name: Check if replica is rebuilded
-         shell: curl http://{{ SVC.stdout }}:9501/v1/replicas | grep createTypes | jq -r '.data[].mode' | grep 'RW'
-         args:
-           executable: /bin/bash
-         register: result
-         delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
-         until: "result.stdout_lines | length  == 3"
-         delay: 60
-         retries: 10
-         changed_when: true
-         tags:
-          - skip_ansible_lint
+       - name: Wait for 180s to ensure volume access mode
+         wait_for:
+           timeout: 180
+
+
+       - name: Check if the replica is rebuilded using mayactl commands
+         include_tasks: "{{ansible_env.HOME}}/{{utils_path}}/access-mode-check.yml"
+         vars:
+           ns: "{{ namespace }}"
 
 
        - name: Test Passed
