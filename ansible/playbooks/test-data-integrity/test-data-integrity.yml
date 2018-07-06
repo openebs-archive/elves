@@ -214,11 +214,13 @@
 
         - name: 12) Verify the data integrity check
           shell: >
-           kubectl logs -f "{{ result_read_pod.stdout }}" -n "{{ namespace }}" | grep err
+            kubectl logs {{ fio_pod_name }} -n "{{ namespace }}"
+            | grep -i error | cut -d ":" -f 2
+            | sort | uniq
           args:
             executable: /bin/bash
           register: result_di
-          failed_when: "'err= 0' not in  result_di.stdout"
+          failed_when: result_di.stdout != " 0,"
           delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
 
         - name: Set the pass flag

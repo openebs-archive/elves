@@ -8,7 +8,7 @@ data:
  File-BasicReadWrite: |-
 
      [global]
-     directory=/datadir1
+     directory=/datadir
      filesize=16m
 
      [basic-fio]
@@ -32,7 +32,7 @@ spec:
         command: ["/bin/bash"]
         args: ["-c", "sleep 60;./fio_runner.sh Basic; exit 0"]
         volumeMounts:
-           - mountPath: /datadir1
+           - mountPath: /datadir
              name: demo-snap-vol1
            - mountPath: templates/Basic/File-BasicReadWrite
              subPath: File-BasicReadWrite
