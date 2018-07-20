@@ -21,6 +21,7 @@ spec:
               cpu: 0.5
           name: percona
           image: percona
+          imagePullPolicy: IfNotPresent
           args:
             - "--ignore-db-dir"
             - "lost+found"
