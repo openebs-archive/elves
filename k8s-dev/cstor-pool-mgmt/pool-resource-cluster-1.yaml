@@ -2,20 +2,18 @@ apiVersion: openebs.io/v1alpha1
 kind: CStorPool
 metadata:
   name: pool1-abc
-  node: node-host-label
   labels:
-#The following label will be used for additional node reference, since we go for UID based selection of pod.
-    "kubernetes.io/hostname": "node-host-label"
+# The following label will be used only for additional node reference for pool, i.e., which
+# pool is located on which node.
+#    "openebs.io/hostname": "node-host-label"
 
 #finalizer helps handling deletion of resource
   finalizers: ["cstorpool.openebs.io/finalizer"]
 
 spec:
   disks:
-   diskList: ["/dev/sdc1"]
+   diskList: ["/dev/sdc","/dev/sdd"]
   poolSpec:
    cacheFile: /tmp/pool1.cache
    poolType: striped
    overProvisioning: false
-status:
-  phase: init

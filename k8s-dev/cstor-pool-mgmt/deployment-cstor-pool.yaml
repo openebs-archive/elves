@@ -22,7 +22,8 @@ spec:
       containers:
       - name: cstor-pool
         # The image name here will be changed to openebs once the business logic pr is reviewed and merged in openebs/maya.
-        image: gkganeshr/cstor-pool:v1.1
+        image: openebs/cstor-pool:ci
+        imagePullPolicy: Always
         ports:
         - containerPort: 12000
           protocol: TCP
@@ -46,7 +47,8 @@ spec:
 
       - name:    cstor-pool-mgmt
         # The image name here will be changed to openebs once the business logic pr is reviewed and merged in openebs/maya.
-        image: gkganeshr/cstor-pool-mgmt:v2.3
+        image: gkganeshr/cstor-pool-mgmt:v2.7
+        imagePullPolicy: Always
         ports:
         - containerPort: 9500
           protocol: TCP
@@ -57,10 +59,12 @@ spec:
           mountPath: /dev
         - name: tmp
           mountPath: /tmp
+        - mountPath: /run/udev
+          name: udev
         env:
           # OPENEBS_IO_CSTOR_ID env has UID of cStorPool CR.
         - name: OPENEBS_IO_CSTOR_ID
-          value: "6eb3a8a5-707e-11e8-8a9f-54e1ad4a9dd4"
+          value: "ec0d620f-89c4-11e8-9b1a-54e1ad4a9dd4"      
 
       volumes:
       - name: device
@@ -73,4 +77,8 @@ spec:
         hostPath:
           # From host, dir called /var/openebs/shared-<uid> is created to avoid clash if two replicas run on same node.
           path: /var/openebs/shared-a2b
+      - name: udev
+        hostPath:
+          path: /run/udev
           type: Directory
+

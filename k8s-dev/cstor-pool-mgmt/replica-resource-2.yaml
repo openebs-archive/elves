@@ -1,0 +1,14 @@
+apiVersion: openebs.io/v1alpha1
+kind: CStorVolumeReplica
+metadata:
+  name: pvc-ee171da3-07d5-11e8-a5be-42010a8001be-cstor-rep-9440ab
+  namespace: default
+  labels:
+   cstorpool.openebs.io/uid : ec0d620f-89c4-11e8-9b1a-54e1ad4a9dd4
+   cstorpool.openebs.io/name: pool1-abc
+   cstorvolumereplica.openebs.io/pvc-name: demo-vol
+   cstorvolume.openebs.io/uid: abc-vol2
+  finalizers: ["cstorvolumereplica.openebs.io/finalizer"]
+spec:
+  targetIP: 172.17.0.11
+  capacity: 10MB
