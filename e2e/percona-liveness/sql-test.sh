@@ -2,7 +2,7 @@
 
 DB_PREFIX="Inventory"
 DB_SUFFIX=`echo $(mktemp) | cut -d '.' -f 2`
-DB_NAME="${DB_PREFIX}-${DB_SUFFIX}"
+DB_NAME="${DB_PREFIX}_${DB_SUFFIX}"
 
 
 echo -e "\nWaiting for mysql server to start accepting connections.."
