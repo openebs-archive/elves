@@ -1,0 +1,25 @@
+apiVersion: openebs.io/v1alpha1
+kind: CStorVolumeReplica
+metadata:
+  name: pvc-ee171da3-07d5-11e8-a5be-42010a8001be-cstor-rep-9440ac
+  namespace: openebs
+  labels:
+#cstorpool uid will be used for reference and matching pool name
+   cstorpool.openebs.io/uid : ec0d620f-89c4-11e8-9b1a-54e1ad4a9dd4
+
+#this pool name is added as additional/alias name with zpool create command.
+   cstorpool.openebs.io/name: pool1-abc
+
+#pvc name is written in cvr label for reference.
+   cstorvolumereplica.openebs.io/pvc-name: demo-vol
+
+#cstorvolume uid will be used in zfs create command as zfs volname.
+   cstorvolume.openebs.io/uid: 6a55-11e8-a958-54e1ad4a9dd4-c3eaf637
+
+#finalizer helps in handling cvr deletion.
+  finalizers: ["cstorvolumereplica.openebs.io/finalizer"]
+
+spec:
+  targetIP: 172.17.0.11
+  capacity: 10MB
+
