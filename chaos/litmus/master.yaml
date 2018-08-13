@@ -1,0 +1,51 @@
+---
+# mayaonline can parse this yaml to obtain tests specific to applications (based on tag) & populate test params,
+# fulfill pre-requisites etc, before deployment
+
+
+litmus_test_1:
+  name: pod_kill
+  location: https://raw.githubusercontent.com/openebs/litmus/master/apps/percona/tests/mysql_data_persistence/run_litmus_test.yaml
+  test_params: 
+    - env: DB_SERVER_IP 
+      value: !!str @userdata
+      # explict typing to prompt the right values from user in mayaonline
+      # @userdata is a value which is either autofilled/user-filled, if empty..
+        default: 10.20.10.100
+        # .. use defaults 
+    - env: DB_USER
+      value: !!str @userdata
+        default: root 
+    - env: DB_PASSWORD
+      value: !!str @userdata
+        default: k8sDem0
+    - env: CHAOS_DURATION
+      value: !!int @userdata
+        default: 120 
+        # In pod spec this still needs to be quoted/taken as string (https://github.com/kubernetes/kubernetes/issues/2763) 
+  test_tags: ['mysql', 'pumba']
+  
+litmus_test_2:
+  name: node_taint
+  location: https://raw.githubusercontent.com/openebs/litmus/master/apps/percona/tests/mysql_data_persistence/run_litmus_test.yaml
+  test_params: 
+    - env: DB_SERVER_IP 
+      value: !!str @userdata
+        default: 10.20.10.100
+        # .. use defaults 
+    - env: DB_USER
+      value: !!str @userdata
+        default: root 
+    - env: DB_PASSWORD
+      value: !!str @userdata
+        default: k8sDem0
+    - env: TAINT_type
+      value: !!int @userdata
+        default: diskpressure 
+  test_tags: ['mysql', 'kubectl']
+  # Ex: In case the job is dependent on a config map (show config for edit)  
+  test_config: 
+    data: # scalar to wrap file content
+      tpcc.conf: |-
+        warehouses: 10
+        connections: 10
