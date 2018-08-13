@@ -15,22 +15,22 @@ litmus_test_1:
       kind: env
       type: string 
       value: '@userdata'
-        default: 10.20.10.100
+      default: 10.20.10.100
     - name: DB_USER
       kind: env
       type: string 
       value: '@userdata'
-        default: root 
+      default: root 
     - name: DB_PASSWORD
       kind: env
       type: string 
       value: '@userdata'
-        default: k8sDem0
+      default: k8sDem0
     - name: CHAOS_DURATION
       kind: env
       type: integer
       value: '@userdata'
-        default: 120 
+      default: 120 
         # In pod spec this still needs to be quoted/taken as string (https://github.com/kubernetes/kubernetes/issues/2763) 
   
 litmus_test_2:
@@ -42,22 +42,22 @@ litmus_test_2:
       kind: env
       type: string
       value: '@userdata'
-        default: 10.20.10.100
+      default: 10.20.10.100
     - name: DB_USER
       kind: env
       type: string
       value: '@userdata'
-        default: root 
+      default: root 
     - name: DB_PASSWORD
       kind: env
       type: string
       value: '@userdata'
-        default: k8sDem0
+      default: k8sDem0
     - name: TAINT_type
       kind: env
       type: integer
       value: '@userdata'
-        default: diskpressure 
+      default: diskpressure 
     - name: tpcc.conf
       kind: configmap
       data: 
