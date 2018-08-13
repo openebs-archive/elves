@@ -1,51 +1,66 @@
 ---
 # mayaonline can parse this yaml to obtain tests specific to applications (based on tag) & populate test params,
-# fulfill pre-requisites etc, before deployment
+# fulfill pre-requisites etc, before deployment. The params are explicitly typed to prompt right values from user.
+# Test parameters can be of different kinds such as ENV, configmap etc., with their own properties.
+# '@userdata' is a placeholder which is either autofilled/userfilled. If empty, use defaults. The test has tags which
+# will help with categorization & application-mapping
 
 
 litmus_test_1:
   name: pod_kill
+  test_tags: ['mysql', 'pumba']
   location: https://raw.githubusercontent.com/openebs/litmus/master/apps/percona/tests/mysql_data_persistence/run_litmus_test.yaml
-  test_params: 
-    - env: DB_SERVER_IP 
-      value: !!str @userdata
-      # explict typing to prompt the right values from user in mayaonline
-      # @userdata is a value which is either autofilled/user-filled, if empty..
+  test_params:
+    - name: DB_SERVER_IP
+      kind: env
+      type: string 
+      value: '@userdata'
         default: 10.20.10.100
-        # .. use defaults 
-    - env: DB_USER
-      value: !!str @userdata
+    - name: DB_USER
+      kind: env
+      type: string 
+      value: '@userdata'
         default: root 
-    - env: DB_PASSWORD
-      value: !!str @userdata
+    - name: DB_PASSWORD
+      kind: env
+      type: string 
+      value: '@userdata'
         default: k8sDem0
-    - env: CHAOS_DURATION
-      value: !!int @userdata
+    - name: CHAOS_DURATION
+      kind: env
+      type: integer
+      value: '@userdata'
         default: 120 
         # In pod spec this still needs to be quoted/taken as string (https://github.com/kubernetes/kubernetes/issues/2763) 
-  test_tags: ['mysql', 'pumba']
   
 litmus_test_2:
   name: node_taint
+  test_tags: ['mysql', 'pumba']
   location: https://raw.githubusercontent.com/openebs/litmus/master/apps/percona/tests/mysql_data_persistence/run_litmus_test.yaml
   test_params: 
-    - env: DB_SERVER_IP 
-      value: !!str @userdata
+    - name: DB_SERVER_IP 
+      kind: env
+      type: string
+      value: '@userdata'
         default: 10.20.10.100
-        # .. use defaults 
-    - env: DB_USER
-      value: !!str @userdata
+    - name: DB_USER
+      kind: env
+      type: string
+      value: '@userdata'
         default: root 
-    - env: DB_PASSWORD
-      value: !!str @userdata
+    - name: DB_PASSWORD
+      kind: env
+      type: string
+      value: '@userdata'
         default: k8sDem0
-    - env: TAINT_type
-      value: !!int @userdata
+    - name: TAINT_type
+      kind: env
+      type: integer
+      value: '@userdata'
         default: diskpressure 
-  test_tags: ['mysql', 'kubectl']
-  # Ex: In case the job is dependent on a config map (show config for edit)  
-  test_config: 
-    data: # scalar to wrap file content
-      tpcc.conf: |-
-        warehouses: 10
-        connections: 10
+    - name: tpcc.conf
+      kind: configmap
+      data: 
+        tpcc.conf: |-
+          warehouses: 10
+          connections: 10
