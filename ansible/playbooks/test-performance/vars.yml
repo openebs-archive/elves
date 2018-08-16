@@ -1,0 +1,17 @@
+---
+test_name: test_performance
+
+test_log_path: setup/logs/test_performance.log
+
+test_pod_regex: maya*|openebs*|fio*
+
+namespace: performance
+
+operator_ns: openebs
+
+fio_write: demo-fio-write-openebs.yml
+
+fio_files:
+  - demo-fio-write-openebs.yml
+
+
