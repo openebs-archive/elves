@@ -1,0 +1,12 @@
+testCase:positive
+resourceCount:3
+poolStatus:3
+generateClusterEnv:false
+commands:
+clearPoolResources:true
+resetCluster:true
+commands:kubectl uncordon gke-cstor-it-default-pool-4fbff4f8-wt09
+applySPC:false
+commandAfterSpcApplication:false
+commands:
+
