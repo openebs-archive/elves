@@ -1,0 +1,127 @@
+---
+- hosts: localhost
+
+  vars_files:
+    - vars.yml
+
+  tasks:
+
+    - block:
+
+        - include: pre-requisites.yml
+
+        - name: 1) Check if maya-apiserver is running.
+          include_tasks: "{{utils_path}}/deploy_check.yml"
+          vars:
+            ns: "{{ operator_ns }}"
+            lvalue: maya-apiserver
+            lkey: name
+
+        - name: 2) Copy the fio job specific files to K8s master
+          copy:
+            src: "{{ item }}"
+            dest: "{{ result_kube_home.stdout }}"
+          with_items: "{{ fio_files }}"
+          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+        - name: 3) Create test specific namespace
+          shell: source ~/.profile; kubectl create ns {{ namespace }}
+          args:
+            executable: /bin/bash
+          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+        - name: 3a) Replace storage-class to use cstor storage engine
+          replace:
+            path: "{{ result_kube_home.stdout }}/{{ fio_files.0 }}"
+            regexp: 'openebs-standard'
+            replace: '{{ cstor_sc }}'
+          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+          when:  storage_engine  == 'cStor'
+
+        - name: 3a) Replace storage-class to use cstor storage engine
+          replace:
+            path: "{{ result_kube_home.stdout }}/{{ fio_files.0 }}"
+            regexp: 'openebs-standard'
+            replace: '{{ jiva_sc }}'
+          delegate_to: "{{ groups['kubernetes-kubemasters'].0 }}"
+          when:  storage_engine  == 'jiva'
+
+        - name: 4) Deploy fio write job yaml
+          include_tasks: "{{utils_path}}/deploy_task.yml"
+          vars:
+           app_yml: "{{ fio_write }}"
+           ns: "{{ namespace }}"
+
+        - name: 5) Check if fio job created successfully
+          shell: source ~/.profile; kubectl get jobs -n "{{ namespace }}"
+          args:
+            executable: /bin/bash
+          register: result_job
+          failed_when: "'fio' not in result_job.stdout"
+          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+
+        - name: 5a) Check if fio write job is completed
+          shell: source ~/.profile; kubectl get pods -a -n "{{ namespace }}" | grep fio
+          args:
+            executable: /bin/bash
+          register: result_fio_pod
+          delegate_to: "{{groups['kubernetes-kubemasters'].0}}"
+          until: "'Completed' in result_fio_pod.stdout"
+          delay: 60
+          retries: 10
+
+        - name: 5c) Get IOPS performed
+          shell: source ~/.profile; kubectl logs '{{ result_fio_pod.stdout.split()[0] }}' -n '{{ namespace }}' | grep write_ios | awk {'print $3'}
+          args:
+            executable: /bin/bash
+          register: metrics
+
+        - name: Store IOPS
+          set_fact:
+            iops: "{{ metrics.stdout.split(',')[0] }}"
+
+        - name: Test Passed
+          set_fact:
+            flag: "Test Passed"
+
+
+        - name: Set Status
+          set_fact:
+            status: "good"
+
+      rescue:
+        - name: Test Failed
+          set_fact:
+            flag: "Test Failed"
+
+        - name: Set Status
+          set_fact:
+            status: "danger"
+
+      always:
+        - block:
+
+            - name: 6) Cleaning the test artifacts
+              include: cleanup.yml
+
+            - name: Test Cleanup Passed
+              set_fact:
+                cflag: "Cleanup Passed"
+
+          rescue:
+            - name: Test Cleanup Failed
+              set_fact:
+                cflag: "Cleanup Failed"
+
+          always:
+
+            - include_tasks: "{{utils_path}}/stern_task.yml"
+              vars:
+                status: stop
+
+            - name: Send slack notification
+              slack:
+                token: "{{ lookup('env','SLACK_TOKEN') }}"
+                msg: '{{ ansible_date_time.time }} TEST: {{test_name}}, RESULT: {{ flag }}, {{ cflag }}'
+                color: "{{status}}"
+              when: slack_notify | bool and lookup('env','SLACK_TOKEN')
