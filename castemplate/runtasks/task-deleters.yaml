@@ -1,0 +1,19 @@
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: task-deleters
+  namespace: default
+spec:
+  meta: |
+    {{- $rslist := .TaskResult.rslist | default "" | splitList " " -}}
+    {{- $namespace := .TaskResult.namespace | default "" -}}
+    id: deleters
+    apiVersion: extensions/v1beta1
+    kind: ReplicaSet
+    action: delete
+    runNamespace: {{ $namespace }}
+    repeatWith:
+      metas:
+      {{- range $k, $rs := $rslist }}
+      - objectName: {{ $rs }}
+      {{- end }}

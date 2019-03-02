@@ -1,0 +1,15 @@
+apiVersion: openebs.io/v1alpha1
+kind: CASTemplate
+metadata:
+  name: demo-template
+spec:
+  run:
+    tasks:
+    - task-getcspdeploy
+    - task-getcspcr
+    - task-listrs
+    - task-patchcspdeploy
+    - task-deleters
+    - task-patchcsp
+    - task-patchsp
+  taskNamespace: default

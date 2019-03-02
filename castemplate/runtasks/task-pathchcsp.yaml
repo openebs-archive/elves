@@ -1,0 +1,19 @@
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: task-patchcsp
+  namespace: default
+spec:
+  meta: |
+    {{- $name := .TaskResult.deploymentname | default "" -}}
+    id: patchcsp
+    apiVersion: openebs.io/v1alpha1
+    kind: CStorPool
+    action: patch
+    objectName: {{ $name }}
+  task: |-
+    type: merge
+    pspec: |-
+      metadata:
+        labels:
+          openebs.io/version: 0.8.1

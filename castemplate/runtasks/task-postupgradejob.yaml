@@ -1,0 +1,37 @@
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: task-postupgradejob
+  namespace: default
+spec:
+  meta: |
+    id: postupgradejob
+    apiVersion: batch/v1
+    runNamespace: default
+    kind: Job
+    action: put
+  post: '{{- "pool-post-upgrade" | addTo "postupgradejob.objectName" .TaskResult |
+    noop -}}'
+  task: |-
+    {{- $pooldeploymentname := .TaskResult.deploymentname | default "" -}}
+    {{- $namespace := .TaskResult.namespace | default "" -}}
+    {{- $poolclaim := .TaskResult.poolclaim | default "" -}}
+    apiVersion: batch/v1
+    Kind: Job
+    metadata:
+      name: pool-post-upgrade{{randAlphaNum 4 |lower }}
+    spec:
+      template:
+        spec:
+          containers:
+          - name: pool-post-upgrade
+            image: shovan1995/poolpostpatch:3
+            command: ["entrypoint.sh"]
+            env:
+            - name: ns
+              value: {{ $namespace }}
+            - name: spc
+              value: {{ $poolclaim }}
+            - name: csp
+              value: {{ $pooldeploymentname }}
+          restartPolicy: Never

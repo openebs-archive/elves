@@ -1,0 +1,19 @@
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: task-listrs
+  namespace: default
+spec:
+  meta: |
+    {{- $namespace := .TaskResult.namespace | default "" -}}
+    {{- $poolclaim := .TaskResult.poolclaim | default "" -}}
+    id: listrs
+    apiVersion: extensions/v1beta1
+    kind: ReplicaSet
+    action: list
+    runNamespace: {{ $namespace }}
+    options: |-
+      labelSelector: app=cstor-pool,openebs.io/storage-pool-claim={{ $poolclaim }}
+  post: |
+    {{- $name := .TaskResult.deploymentname | default "" -}}
+    {{- jsonpath .JsonResult "{range .items[?(@.metadata.ownerReferences[0].name== 'cstor-sparse-pool-4ylk')]}{@.metadata.name} {end}" | trim | saveAs "rslist" .TaskResult | noop -}}

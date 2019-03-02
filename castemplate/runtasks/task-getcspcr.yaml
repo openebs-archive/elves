@@ -1,0 +1,15 @@
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: task-getcspcr
+  namespace: default
+spec:
+  meta: |
+    {{- $name := .TaskResult.deploymentname | default "" -}}
+    id: getcspcr
+    apiVersion: openebs.io/v1alpha1
+    kind: CStorPool
+    action: get
+    objectName: {{ $name }}
+  post: |-
+    '{{- jsonpath .JsonResult "{.metadata.uid}" | trim | saveAs "cspuid" .TaskResult | noop -}}'

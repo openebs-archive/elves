@@ -1,0 +1,19 @@
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: task-patchsp
+  namespace: default
+spec:
+  meta: |
+    {{- $name := .TaskResult.deploymentname | default "" -}}
+    id: patchsp
+    apiVersion: openebs.io/v1alpha1
+    kind: StoragePool
+    action: patch
+    objectName: {{ $name }}
+  task: |-
+    type: merge
+    pspec: |-
+      metadata:
+        labels:
+          openebs.io/version: 0.8.1

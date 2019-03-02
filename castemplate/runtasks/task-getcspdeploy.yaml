@@ -1,0 +1,17 @@
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: task-getcspdeploy
+  namespace: default
+spec:
+  meta: |
+    id: getcspdeployment
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    action: get
+    objectName: cstor-sparse-pool-4ylk #TODO update it runtime
+    runNamespace: openebs #TODO update it runtime
+  post: |-
+    {{- jsonpath .JsonResult "{.metadata.name}" | trim | saveAs "deploymentname" .TaskResult | noop -}}
+    {{- jsonpath .JsonResult "{.metadata.namespace}" | trim | saveAs "namespace" .TaskResult | noop -}}
+    {{- jsonpath .JsonResult "{.metadata.labels.openebs\\.io/storage-pool-claim}" | trim | saveAs "poolclaim" .TaskResult | noop -}}
