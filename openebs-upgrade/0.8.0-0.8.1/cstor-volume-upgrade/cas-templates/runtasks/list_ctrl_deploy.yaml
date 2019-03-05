@@ -1,0 +1,17 @@
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: list-ctrl-deployment
+  namespace: default
+spec:
+  meta: |
+    id: listctrldeployment
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    action: list
+    runNamespace: {{.Config.namespace.value}}
+    options: |-
+      labelSelector: openebs.io/persistent-volume={{ .Config.pvName.value }},openebs.io/target=cstor-target
+  post: |-
+    '{{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "ctrl_deployment" .TaskResult | noop -}}'
+

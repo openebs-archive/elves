@@ -1,0 +1,16 @@
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: get-vol-info
+  namespace: default
+spec:
+  meta: |
+    id: getvolinfo
+    apiVersion: v1
+    kind: PersistentVolume
+    action: get
+    objectName: {{.Config.pvName.value}}
+  post: |-
+    '{{- jsonpath .JsonResult "{.metadata.annotations.openebs\\.io/cas-type}" | trim | saveAs "vol_cas_type" .TaskResult | noop -}}'
+    '{{- jsonpath .JsonResult "{.spec.storageClassName}" | trim | saveAs "sc_name" .TaskResult | noop -}}'
+    '{{- jsonpath .JsonResult "{.spec.claimRef.namespace}" | trim | saveAs "sc_namespace" .TaskResult | noop -}}'

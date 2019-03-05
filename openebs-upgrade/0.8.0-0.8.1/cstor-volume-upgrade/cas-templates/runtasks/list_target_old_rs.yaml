@@ -1,0 +1,16 @@
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: list-target-old-rs
+  namespace: default
+spec:
+  meta: |
+    id: listtargetoldrs
+    apiVersion: extensions/v1beta1
+    kind: ReplicaSet
+    action: list
+    runNamespace: {{ .Config.namespace.value }}
+    options: |-
+      labelSelector: openebs.io/persistent-volume={{ .Config.pvName.value }}
+  post: |-
+    '{{- jsonpath .JsonResult "{.items[*].metadata.name}" | trim | saveAs "target_older_rs" .TaskResult | noop -}}'

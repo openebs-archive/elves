@@ -1,0 +1,46 @@
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: deploy-rollout-status
+  namespace: default
+spec:
+  meta: |
+    {{- $depname := .TaskResult.ctrl_deployment | default "" -}}
+    id: deployrolloutstatus
+    runNamespace: {{ .Config.namespace.value }}
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    action: get
+    objectName: {{ $depname }}
+    retry: "20,120s"
+  post: |
+    {{- $replicas := .TaskResult.replicacount | default "" -}}
+    {{- $updatedReplicas := .TaskResult.updatedReplicacount | default "" -}}
+    {{- $readyReplicas := .TaskResult.readyReplicacount | default "" -}}
+    {{- $availableReplicas := .TaskResult.availableReplicacount | default "" -}}
+    {{- "" | saveAs "verifyErr" .TaskResult | noop -}}
+    {{- if eq $replicas "" }}
+    {{- "replica count not  present" | saveAs "deployrolloutstatus.verifyErr" .TaskResult | noop -}}
+    {{- end }}
+    {{- if eq $updatedReplicas "" }}
+    {{- "updated replica count not  present" | saveAs "deployrolloutstatus.verifyErr" .TaskResult | noop -}}
+    {{- end }}
+    {{- if eq $readyReplicas "" }}
+    {{- "ready replica count not  present" | saveAs "deployrolloutstatus.verifyErr" .TaskResult | noop -}}
+    {{- end }}
+    {{- if eq $availableReplicas "" }}
+    {{- "available replica count not  present" | saveAs "deployrolloutstatus.verifyErr" .TaskResult | noop -}}
+    {{- end }}
+    {{- if ne $replicas $updatedReplicas }}
+    {{- "replica count is not equal with updated replica count" | saveAs "deployrolloutstatus.verifyErr" .TaskResult | noop -}}
+    {{- end }}
+    {{- if ne $replicas $readyReplicas }}
+    {{- "replica count is not equal with ready replica count" | saveAs "deployrolloutstatus.verifyErr" .TaskResult | noop -}}
+    {{- end }}
+    {{- if ne $replicas $availableReplicas }}
+    {{- "replica count is not equal with available replica count" | saveAs "deployrolloutstatus.verifyErr" .TaskResult | noop -}}
+    {{- end }}
+    {{- jsonpath .JsonResult "{.status.replicas}" | trim | saveAs "replicacount" .TaskResult | default "" noop -}}
+    {{- jsonpath .JsonResult "{.status.updatedReplicas}" | trim | saveAs "updatedReplicacount" .TaskResult | default "" noop -}}
+    {{- jsonpath .JsonResult "{.status.readyReplicas}" | trim | saveAs "readyReplicacount" .TaskResult | default "" noop -}}
+    {{- jsonpath .JsonResult "{.status.availableReplicas}" | trim | saveAs "availableReplicacount" .TaskResult | default "" noop -}}

@@ -1,0 +1,26 @@
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: patch-cstor-volume-replica
+  namespace: default
+spec:
+  meta: |
+    {{- $cstorVolReplicaList := .TaskResult.cstor_volume_replicas | default "" | splitList " " -}}
+    id: patchcstorvolumereplicacr
+    apiVersion: openebs.io/v1alpha1
+    kind: CStorVolumeReplica
+    runNamespace: {{ .Config.namespace.value }}
+    action: patch
+    repeatWith:
+      metas:
+      {{- range $k, $cvr := $cstorVolReplicaList }}
+      - objectName: {{ $cvr }}
+      {{- end }}
+  task: |-
+    type: merge
+    pspec: |-
+      metadata:
+        annotations: 
+          openebs.io/storage-class-ref: "name: {{ .TaskResult.sc_name }}\nresourceVersion: {{ .TaskResult.sc_res_version }}\n"
+        labels: 
+          openebs.io/version: {{ .Config.targetVersion.value }}

@@ -1,0 +1,18 @@
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: delete-target-old-replicaset
+  namespace: default
+spec:
+  meta: | 
+    {{- $rslist := .TaskResult.target_older_rs | default "" | splitList " " -}}
+    id: deletereplicaset
+    apiVersion: extensions/v1beta1
+    kind: ReplicaSet
+    runNamespace: {{ .Config.namespace.value }}
+    action: delete
+    repeatWith:
+      metas:
+      {{- range $k, $rs := $rslist }}
+      - objectName: {{ $rs }}
+      {{- end }}

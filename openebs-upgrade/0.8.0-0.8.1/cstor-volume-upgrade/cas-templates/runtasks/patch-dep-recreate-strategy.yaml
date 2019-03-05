@@ -1,0 +1,20 @@
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: patch-deployment-recreate-strategy
+  namespace: default
+spec:
+  meta: |
+    id: patchdeployment
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    runNamespace: {{ .Config.namespace.value }}
+    objectName: {{ .TaskResult.ctrl_deployment }}
+    action: patch
+  task: |-
+    type: merge
+    pspec: |-
+      spec:
+        strategy:
+          rollingUpdate:
+          type: Recreate

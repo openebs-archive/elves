@@ -1,0 +1,21 @@
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: patch-cstor-volume-cr
+  namespace: default
+spec:
+  meta: |
+    id: patchcstorvolumecr
+    apiVersion: openebs.io/v1alpha1
+    kind: CStorVolume
+    runNamespace: {{ .Config.namespace.value }}
+    objectName: {{ .TaskResult.cstor_volumes }}
+    action: patch
+  task: |-
+    type: merge
+    pspec: |-
+      metadata:
+        annotations: 
+          openebs.io/storage-class-ref: "name: {{ .TaskResult.sc_name }}\nresourceVersion: {{ .TaskResult.sc_res_version }}\n"
+        labels: 
+          openebs.io/version: {{ .Config.targetVersion.value }}

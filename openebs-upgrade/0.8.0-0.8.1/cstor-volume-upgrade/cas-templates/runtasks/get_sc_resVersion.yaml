@@ -1,0 +1,15 @@
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: get-sc-res-version
+  namespace: default
+spec:
+  meta: |
+    id: getstorageclassresversion
+    apiVersion: storage.k8s.io/v1
+    kind: StorageClass
+    action: get
+    objectName: {{.TaskResult.sc_name}}
+    runNamespace: {{.TaskResult.sc_namespace}}
+  post: |-
+    '{{- jsonpath .JsonResult "{.metadata.resourceVersion}" | trim | saveAs "sc_res_version" .TaskResult | noop -}}'

@@ -1,0 +1,36 @@
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: patch-target-deployment
+  namespace: default
+spec:
+  meta: |
+    id: patchtargetdeployment
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    runNamespace: {{ .Config.namespace.value }}
+    objectName: {{ .TaskResult.ctrl_deployment }}
+    action: patch
+  task: |-
+    type: strategic
+    pspec: |-
+      metadata:
+        annotations: 
+          openebs.io/storage-class-ref: "name: {{ .TaskResult.sc_name }}\nresourceVersion: {{ .TaskResult.sc_res_version }}\n"
+        labels: 
+          openebs.io/version: {{ .Config.targetVersion.value}}
+      spec: 
+        template: 
+          metadata: 
+            annotations: 
+              openebs.io/storage-class-ref: "name: {{ .TaskResult.sc_name }}\nresourceVersion: {{ .TaskResult.sc_res_version }}\n"
+            labels: 
+              openebs.io/storage-class: {{ .TaskResult.sc_name }}
+          spec: 
+            containers: 
+            - name: cstor-istgt
+              image: quay.io/openebs/cstor-istgt:{{ .Config.targetVersion.value}}
+            - name: maya-volume-exporter
+              image: quay.io/openebs/m-exporter:{{ .Config.targetVersion.value}}
+            - name: cstor-volume-mgmt
+              image: quay.io/openebs/cstor-volume-mgmt:{{ .Config.targetVersion.value}}

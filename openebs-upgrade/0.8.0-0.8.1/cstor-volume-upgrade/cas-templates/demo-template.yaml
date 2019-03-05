@@ -1,0 +1,29 @@
+apiVersion: openebs.io/v1alpha1
+kind: CASTemplate
+metadata:
+  name: demo-vol-template
+spec:
+  defaultConfig:
+  - name: pvName
+    value: "pvc-7e7e3a07-3f31-11e9-9a4c-42010a800058" # name of the volume to be upgraded
+  - name: namespace
+    value: "openebs"
+  - name: targetVersion
+    value: "0.8.1"
+  run:
+    tasks:
+    - get-vol-info
+    - get-sc-res-version
+    - list-ctrl-deployment
+    - list-ctrl-svc
+    - list-cstor-volumes-cr
+    - list-cstor-volume-replicas
+    - list-target-old-rs
+    - patch-deployment-recreate-strategy
+    - patch-target-deployment
+    - deploy-rollout-status
+    - delete-target-old-replicaset
+    - patch-target-svc
+    - patch-cstor-volume-cr
+    - patch-cstor-volume-replica
+  taskNamespace: default

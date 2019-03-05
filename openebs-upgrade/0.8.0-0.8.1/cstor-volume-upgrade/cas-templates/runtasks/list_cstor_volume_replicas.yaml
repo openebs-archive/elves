@@ -1,0 +1,17 @@
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: list-cstor-volume-replicas	
+  namespace: default
+spec:
+  meta: |
+    id: listcstorvolumeReplicas
+    apiVersion: openebs.io/v1alpha1
+    kind: CStorVolumeReplica
+    action: list
+    runNamespace: {{.Config.namespace.value}}
+    options: |-
+      labelSelector: openebs.io/persistent-volume={{ .Config.pvName.value }}
+  post: |-
+    '{{- jsonpath .JsonResult "{range .items[*]}{@.metadata.name} {end}" | trim | saveAs "cstor_volume_replicas" .TaskResult | noop -}}'
+

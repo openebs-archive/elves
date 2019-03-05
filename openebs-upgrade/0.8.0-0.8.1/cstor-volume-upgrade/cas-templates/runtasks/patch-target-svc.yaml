@@ -1,0 +1,21 @@
+apiVersion: openebs.io/v1alpha1
+kind: RunTask
+metadata:
+  name: patch-target-svc
+  namespace: default
+spec:
+  meta: |
+    id: patchtargetsvc
+    apiVersion: v1
+    kind: Service
+    runNamespace: {{ .Config.namespace.value }}
+    objectName: {{ .TaskResult.ctrl_svc }}
+    action: patch
+  task: |-
+    type: merge
+    pspec: |-
+      metadata:
+        annotations: 
+          openebs.io/storage-class-ref: "name: {{ .TaskResult.sc_name }}\nresourceVersion: {{ .TaskResult.sc_res_version }}\n"
+        labels: 
+          openebs.io/version: {{ .Config.targetVersion.value }}
