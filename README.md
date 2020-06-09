@@ -1,3 +1,10 @@
+This Project has been archived. 
+
+The experiments that started in elves have been shifted and worked under new repos. 
+
+- For Storage, checkout https://github.com/openebs/openebs
+- For Litmus, checkout https://github.com/litmuschaos
+
 # Elves
 
 This is playground for various experiments, beliefs w.r.t OpenEBS. This repo 
